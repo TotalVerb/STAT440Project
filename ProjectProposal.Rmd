@@ -17,7 +17,7 @@ The estimation of the latter quantity is important for policy, because infectiou
 
 Many infectious diseases are believed to be seasonal, including most respiratory viruses, like the SARS-CoV-2 virus implicated in the 2019–2020 coronavirus pandemic. Wang et al. (2020) have analysed how the weather of locations within China correlates with local point estimates of the reproductive number $R$. However, because their analysis is frequentist in nature, their estimates of the seasonal forcing do not come with any estimate of uncertainty.
 
-## Bayesian Framework for Estimation of Time-Varying R
+## Bayesian Framework for Estimation of Time-Varying $R$
 
 Thompson et al. (2019) outline a Bayesian framework for estimation of $R(t)$ using symptomatic case counts, decomposed into local and imported cases. The EpiEstim R package implements ideas from this paper. A simplified summary of their approach, ignoring the imported cases:
 
@@ -39,7 +39,7 @@ where $\beta$ is a parameter describing the locally linear effect of each season
 $$ I_i(t) \space | \space I_i(1), \cdots ,I_i(t-1),w,x_i(t), \varepsilon_i(t) \sim \text{Poisson} \left( (\beta^Tx_i(t)+ \varepsilon_i(t)) \sum_{s=1}^t I(t-s) w_s \right) $$
 
 Here the parameter of interest is $\beta$ and the $\varepsilon_i(t)$ are nuisance variables. We propose to use Markov chain Monte Carlo to compute a joint distribution over all the parameters and marginalize over the $\varepsilon_i(t)$.
-Because of concerns over confounding factors that may affect R and are correlated with temperature and humidity, we plan to add several other features to $x(t)$ to help control for these factors. We also need to restrict the analysis to the pre-lockdown regime in each province, because the lockdown is likely to change the magnitude of seasonal forcings.
+Because of concerns over confounding factors that may affect $R$ and are correlated with temperature and humidity, we plan to add several other features to $x(t)$ to help control for these factors. We also need to restrict the analysis to the pre-lockdown regime in each province, because the lockdown is likely to change the magnitude of seasonal forcings.
 
 - Time (days)
 - GDP per capita
@@ -48,7 +48,7 @@ Because of concerns over confounding factors that may affect R and are correlate
 ## Dataset
 
 - The Italian government dataset at https://github.com/pcm-dpc/COVID-19 contains the disease incidence for each province. This data contains date of confirmation instead of date of onset of symptoms, and so some procedure may be necessary to correct for this. Abbott et al. (2020) outlines a technique to correct for reporting delays using an exponential distribution of reporting delay fit to line list data; we may use the same distribution.
-- We also will need to find temperature and humidity data. We have located several possible sources and are evaluating them.
+- The `worldmet` R package enables access to temperature and humidity data, sourced from NOAA.
 
 ## Directions for Future Research
 
