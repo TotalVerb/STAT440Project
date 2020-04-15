@@ -1,0 +1,22 @@
+Package: cfc19i
+Title: Contains software for modeling climate forcings on the early stages of the COVID-19 outbreak in Italy.
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Joanna",
+           family = "Lu",
+           role = c("aut", "cre"))
+    person(given = "Trista",
+           family = "Tian",
+           role = c("aut", "cre"))
+    person(given = "Fengyang",
+           family = "Wang",
+           role = c("aut", "cre"))
+    person(given = "Ben",
+           family = "Zhang",
+           role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: use_mit_license()
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
