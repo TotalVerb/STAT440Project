@@ -19,7 +19,7 @@ fetch_file <- function(url, filename) {
 #'
 fetch_latest_ecdc <- function() {
   url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
-  file_name <- "data/ecdc-COVID-19-up-to-date.csv"
+  filename <- "data/ecdc-COVID-19-up-to-date.csv"
   fetch_file(url, filename)
   
   #' Quick cleanup on the column titles.
