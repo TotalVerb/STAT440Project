@@ -1,6 +1,7 @@
 library(restatapi)
 library(dplyr)
-library(worldmet)  # TODO : not done yet
+library(worldmet)
+library(memoise)
 
 # Obtain mapping of health ministry province names to eurostat codes
 
@@ -65,9 +66,9 @@ getdemodata <- function() {
   full_join(df, itprovinces, by = c("geo" = "code"))
 }
 
-# Augment Italy DPC data with weather (TODO) and demographics
+# Augment Italy DPC data with demographics
 # Also remove Sardinia provinces
-augmentDPC <- function(dpc, demodata) {
+augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, lat != 0)  # not regional data
   dpc <- filter(dpc, denominazione_regione != "Sardegna")
 
@@ -76,11 +77,43 @@ augmentDPC <- function(dpc, demodata) {
   df
 }
 
+closestweatherstation <- function(lat, long) {
+  getMeta(lat = lat, lon = long, n = 1)$code[1]
+}
+closestweatherstationM <- memoise(closestweatherstation)
+
+importNOAAM <- memoise(importNOAA)
+
+# Augment a single group of data points with weather, using just one station code.
+augmentsingleweather <- function(group, station) {
+  print(station$station[1])
+  noaa <- importNOAAM(code = station$station[1], year = 2020)
+  print(group)
+  print(noaa)
+  result <- left_join(group, noaa, by = "date")
+  print(result)
+  select(result, -c("station"))
+}
+
+# Augment a table with date, lat, and long columns with weather data collected closest to the given time.
+augmentDPCweather <- function(dpc) {
+  # 1. Find the appropriate station code for each latitude and longitude present in data.
+  dpc <- mutate(dpc, station = mapply(closestweatherstationM, lat = lat, long = long))
+  dpc <- mutate(dpc, date = as.POSIXct(data, format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
+  dpc <- select(dpc, -c("data"))
+  group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup
+}
+
 
 # test code
 demodata <- getdemodata()
 dpc <- read.csv("data/dpc-covid19-ita-province.csv")
-df <- augmentDPC(dpc, demodata)
+df <- augmentDPCdemo(dpc, demodata)
+df <- augmentDPCweather(df)
+write.csv(df, "data/dpc-augmented.csv")
 
 # test: check that no provinces weren't mapped to demographic data
 stopifnot(nrow(filter(df, is.na(density))) == 0)
+
+# test: check no temperature NAs (fails! TODO)
+stopifnot(nrow(filter(df, is.na(air_temp))) == 0)
