@@ -33,6 +33,7 @@ fetch_latest_ecdc <- function() {
   names(d)[names(d) == "dateRep"] <- "DateRep"
   saveRDS(d, "data/ecdc-COVID-19-up-to-date.rds")
 }
+fetch_latest_ecdc()
 
 #' Fetches latest data from John Hopkins University CSSE.
 #'
@@ -49,12 +50,13 @@ fetch_latest_csse <- function() {
   filename <- "data/time_series_covid19_recovered_global.csv"
   fetch_file(url, filename)
 }
+fetch_latest_csse()
 
-
+#' Fetch Italian provinces data.
+#'
 fetch_latest_dpc <- function() {
-  #' Fetch Italian provinces data.
-  #'
-  url <- "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province-latest.csv"
-  filename <- "data/dpc-covid19-ita-province-latest.csv"
+  url <- "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv"
+  filename <- "data/dpc-covid19-ita-province.csv"
   fetch_file(url, filename)
 }
+fetch_latest_dpc()
