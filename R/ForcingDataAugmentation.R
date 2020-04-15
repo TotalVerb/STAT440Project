@@ -73,7 +73,7 @@ augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, denominazione_regione != "Sardegna")
 
   df <- left_join(dpc, demodata, by = c("denominazione_provincia" = "name"))
-  df <- select(df, c("data", "denominazione_provincia", "lat", "long", "gdppercapita", "density"))
+  df <- select(df, c("data", "denominazione_provincia", "lat", "long", "gdppercapita", "density", "totale_casi"))
   df
 }
 
@@ -104,10 +104,18 @@ augmentDPCweather <- function(dpc) {
   group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup
 }
 
+# Repair total case data to be monotonically increasing, through taking a rolling maximum.
+repairtotalcases <- function(dpc) {
+  (dpc
+   %>% group_by(denominazione_provincia)
+   %>% group_modify(~ arrange(.x, by = data) %>% mutate(totale_casi = cummax(totale_casi)))
+   %>% ungroup)
+}
 
 # test code
 demodata <- getdemodata()
 dpc <- read.csv("data/dpc-covid19-ita-province.csv")
+df <- repairtotalcases(dpc)
 df <- augmentDPCdemo(dpc, demodata)
 df <- augmentDPCweather(df)
 write.csv(df, "data/dpc-augmented.csv")
