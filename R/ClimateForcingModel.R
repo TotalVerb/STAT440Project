@@ -24,6 +24,10 @@ df <- (
   %>% ungroup
 )
 
+# TODO: also kind of a hack, need to figure out the best actual date to stop the analysis
+# Using peak of reported cases as a hack
+df <- filter(df, date <= "2020-03-13")
+
 standardize <- function(series) {
   (series - mean(series)) / sd(series)
 }
@@ -42,6 +46,8 @@ X <- abind(split(
 
 I <- abind(split(df$infections, df$denominazione_provincia), along=2)
 
+pop <- abind(df %>% group_by(denominazione_provincia) %>% group_map(~ .x$population[1]), along=1)
+
 # TODO: use a correct discretized serial interval distribution
 w <- rep(0, nrow(I))
 w[1] <- 0.1
@@ -49,7 +55,9 @@ w[2] <- 0.2
 w[3] <- 0.3
 w[4] <- 0.2
 w[5] <- 0.1
-w[6] <- 0.1
+w[6] <- 0.05
+w[7] <- 0.03
+w[8] <- 0.02
 
 # stan data
 cf_data <- list(
@@ -58,11 +66,12 @@ cf_data <- list(
   T = nrow(I),
   w = w,
   i = I,
-  x = as.array(X)
+  x = as.array(X),
+  pop = pop
 )
 
 # fit stan model
-cf_fit <- sampling(cf_mod, data = cf_data, iter = 400,
-                   verbose = TRUE, chains = 4)
+cf_fit <- sampling(cf_mod, data = cf_data, iter = 1000,
+                   verbose = TRUE, chains = 5)
 
 save(cf_fit, file="data/cf_fit.rds")

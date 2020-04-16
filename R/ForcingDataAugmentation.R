@@ -54,13 +54,26 @@ getdemodata <- function() {
     date_filter="2017",
     filters=itprovinces$code
   )
-  density <- droplevels(select(density, c("geo", "values")))
+  density <- select(density, c("geo", "values"))
   density$geo <- as.character(density$geo)
 
+  population <- filter(get_eurostat_data(
+    "demo_r_pjangrp3",
+    date_filter="2017",
+    filters=itprovinces$code
+  ), sex == "T" & age == "TOTAL")
+  population <- select(population, c("geo", "values"))
+  population$geo <- as.character(population$geo)
+
   df <- rename(
-    full_join(gdppercapita, density, by = 'geo'),
-    gdppercapita = values.x,
-    density = values.y
+    rename(
+      gdppercapita %>%
+        full_join(density, by = 'geo'),
+      gdppercapita = values.x,
+      density = values.y
+    ) %>%
+    full_join(population, by = 'geo'),
+    population = values
   )
 
   full_join(df, itprovinces, by = c("geo" = "code"))
@@ -73,7 +86,8 @@ augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, denominazione_regione != "Sardegna")
 
   df <- left_join(dpc, demodata, by = c("denominazione_provincia" = "name"))
-  df <- select(df, c("data", "denominazione_provincia", "lat", "long", "gdppercapita", "density", "totale_casi"))
+  df <- select(df,
+               c("data", "denominazione_provincia", "lat", "long", "gdppercapita", "density", "totale_casi", "population"))
   df
 }
 
