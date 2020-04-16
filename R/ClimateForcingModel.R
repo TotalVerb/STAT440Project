@@ -83,3 +83,4 @@ cf_data <- list(
 cf_fit <- sampling(cf_mod, data = cf_data, verbose = TRUE)
 
 save(cf_fit, file="data/cf_fit.rds")
+save(cf_data, file="data/cf_data.rds")
