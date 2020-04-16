@@ -53,3 +53,4 @@ cf_data <- list(
 # fit stan model
 cf_fit <- sampling(cf_mod, data = cf_data, iter = 400,
                    verbose = TRUE, chains = 4)
+

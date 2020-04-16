@@ -7,18 +7,24 @@ data {
   real x[T,P,L]; // climate information
 }
 parameters {
-  row_vector[P] beta;
-  matrix[L,T] epsilon;  // residual
+  real alpha;                 // constant log(R0)
+  row_vector[P] beta;         // linear approximation for log(R) - log(RO)
+  matrix[L,T] epsilon;        // residual in data
+  real<lower=0> importations; // number of importations into each province on each day
 }
 model {
+  # prior (very weakly informative), R0 usually estimated around 2.5
+  alpha ~ normal(log(2.5), 1);
+
+  # likelihood
   for (l in 1:L) {
     for (t in 1:T) {
-      real lambda = beta * to_vector(x[t, :, l]) + epsilon[l, t];
+      real R = exp(alpha + beta * to_vector(x[t, :, l]) + epsilon[l, t]);
       real serials = 0.0;
       for (s in 1:(t-1)) {
         serials += w[s] * i[t-s, l];
       }
-      i[t,l] ~ poisson(lambda * serials);
+      i[t,l] ~ poisson(R * serials + importations);
     }
   }
 }
