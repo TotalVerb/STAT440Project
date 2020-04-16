@@ -24,8 +24,19 @@ df <- (
   %>% ungroup
 )
 
+standardize <- function(series) {
+  (series - mean(series)) / sd(series)
+}
+df <- (
+  df
+  %>% mutate(std_air_temp = standardize(air_temp),
+             std_RH = standardize(RH),
+             std_gdppercapita = standardize(gdppercapita),
+             std_density = standardize(density))
+)
+
 X <- abind(split(
-  select(df, c('air_temp', 'RH', 'gdppercapita', 'density')),
+  select(df, c('std_air_temp', 'std_RH', 'std_gdppercapita', 'std_density')),
   df$denominazione_provincia
 ), along=3)
 
@@ -54,3 +65,4 @@ cf_data <- list(
 cf_fit <- sampling(cf_mod, data = cf_data, iter = 400,
                    verbose = TRUE, chains = 4)
 
+save(cf_fit, file="data/cf_fit.rds")

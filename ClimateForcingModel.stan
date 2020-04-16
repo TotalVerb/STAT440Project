@@ -13,10 +13,15 @@ parameters {
   real<lower=0> importations; // number of importations into each province on each day
 }
 model {
-  # prior (very weakly informative), R0 usually estimated around 2.5
+  // prior for intercept (very weakly informative), R0 usually estimated around 2.5
   alpha ~ normal(log(2.5), 1);
 
-  # likelihood
+  // prior for beta (very weak) [note on unit scale, variation of 1 is high]
+  for (p in 1:P) {
+    beta[p] ~ normal(0, 1);
+  }
+
+  // likelihood
   for (l in 1:L) {
     for (t in 1:T) {
       real R = exp(alpha + beta * to_vector(x[t, :, l]) + epsilon[l, t]);
