@@ -26,7 +26,7 @@ df <- (
 
 # TODO: also kind of a hack, need to figure out the best actual date to stop the analysis
 # Using peak of reported cases as a hack
-df <- filter(df, date <= "2020-03-20")
+df <- filter(df, date <= "2020-03-13")
 
 standardize <- function(series) {
   (series - mean(series)) / sd(series)
@@ -71,7 +71,7 @@ cf_data <- list(
 )
 
 # fit stan model
-cf_fit <- sampling(cf_mod, data = cf_data, iter = 800,
-                   verbose = TRUE, chains = 4)
+cf_fit <- sampling(cf_mod, data = cf_data, iter = 1000,
+                   verbose = TRUE, chains = 5)
 
 save(cf_fit, file="data/cf_fit.rds")

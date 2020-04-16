@@ -17,15 +17,15 @@ model {
   // prior for intercept (very weakly informative), R0 usually estimated around 2.5
   alpha ~ normal(log(2.5), 1);
 
-  // prior for beta (very weak) [note on unit scale, variation of 1 is high]
+  // prior for beta (weak) [note on unit scale, variation of 1 is high]
   for (p in 1:P) {
-    beta[p] ~ normal(0, 1);
+    beta[p] ~ normal(0, 0.5);
   }
 
-  // prior for epsilon (also very weak)
+  // prior for epsilon (weak)
   for (l in 1:L) {
     for (t in 1:T) {
-      epsilon[l,t] ~ normal(0, 1);
+      epsilon[l,t] ~ normal(0, 0.5);
     }
   }
 
