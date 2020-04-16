@@ -116,8 +116,9 @@ repairtotalcases <- function(dpc) {
 demodata <- getdemodata()
 dpc <- read.csv("data/dpc-covid19-ita-province.csv")
 df <- repairtotalcases(dpc)
-df <- augmentDPCdemo(dpc, demodata)
+df <- augmentDPCdemo(df, demodata)
 df <- augmentDPCweather(df)
+write.csv(demodata, "data/demodata.csv")
 write.csv(df, "data/dpc-augmented.csv")
 
 # test: check that no provinces weren't mapped to demographic data
