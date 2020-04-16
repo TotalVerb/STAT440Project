@@ -30,7 +30,7 @@ model {
   }
 
   // prior for importations per capita [populations are not normalized]
-  importations ~ gamma(2e-5, 0);
+  importations ~ gamma(2, 1e-5);
 
   // likelihood
   for (l in 1:L) {
