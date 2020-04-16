@@ -13,10 +13,7 @@ df <- mutate(
   df,
   infections = coalesce(pmax(0, totale_casi - lag(totale_casi)), 0)
 )
-# TODO: this is a hack, do this a better way...
-# Drop the last date as it is NA for all locations.
-# Then drop the locations with some NA in data.
-df <- filter(df, date != max(as.character(date)))
+# Drop the locations with some NA in data (there should be none, TODO delete this code).
 df <- (
   df
   %>% group_by(denominazione_provincia)

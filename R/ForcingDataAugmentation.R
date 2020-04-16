@@ -2,7 +2,6 @@ library(restatapi)
 library(dplyr)
 library(worldmet)
 library(memoise)
-library(safejoin)
 
 # Obtain mapping of health ministry province names to eurostat codes
 
@@ -101,17 +100,13 @@ importNOAAM <- memoise(importNOAA)
 
 # Augment a single group of data points with weather, using a list of station codes.
 augmentsingleweather <- function(group, station) {
-  fallbacks <- strsplit(station$station[1], ",")
-  result <- group
-  for (code in fallbacks) {
-    print(paste("Looking up weather for ", code))
-    noaa <- importNOAAM(code = code, year = 2020)
-    result <- safe_left_join(result, noaa, by = "date", conflict = coalesce)
-    if (all(!is.na(result$air_temp)) & all(!is.na(result$RH))) {
-      break;
-    }
-  }
-  select(result, -c("station"))
+  fallbacks <- strsplit(station$station[1], ",")[[1]]
+  print(paste("Looking up weather for", fallbacks))
+  noaa <- importNOAAM(code = fallbacks, year = 2020)
+  noaa <- noaa %>% group_by(date) %>% summarize(
+    air_temp = first(na.omit(air_temp)), RH = first(na.omit(RH))
+  )
+  left_join(group, noaa, by = "date")
 }
 
 # Augment a table with date, lat, and long columns with weather data collected closest to the given time.
@@ -133,11 +128,14 @@ augmentDPCweather <- function(dpc) {
 }
 
 # Repair total case data to be monotonically increasing, through taking a rolling maximum.
+# Also drop the last date as it is likely to have no weather data for each location.
 repairtotalcases <- function(dpc) {
   (dpc
    %>% group_by(denominazione_provincia)
    %>% group_modify(~ arrange(.x, by = data) %>% mutate(totale_casi = cummax(totale_casi)))
-   %>% ungroup)
+   %>% ungroup
+   %>% filter(data != max(as.character(data)))
+   )
 }
 
 # test code
@@ -152,5 +150,5 @@ write.csv(df, "data/dpc-augmented.csv")
 # test: check that no provinces weren't mapped to demographic data
 stopifnot(nrow(filter(df, is.na(density))) == 0)
 
-# test: check no temperature NAs (fails! TODO)
+# test: check no temperature NAs
 stopifnot(nrow(filter(df, is.na(air_temp))) == 0)
