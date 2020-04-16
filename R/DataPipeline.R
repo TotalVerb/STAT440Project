@@ -31,7 +31,7 @@ fetch_latest_ecdc <- function() {
   names(d)[names(d) == "deaths"] <- "Deaths"
   names(d)[names(d) == "cases"] <- "Cases"
   names(d)[names(d) == "dateRep"] <- "DateRep"
-  saveRDS(d, "data/ecdc-COVID-19-up-to-date.rds")
+  write.csv(d, filename)
 }
 fetch_latest_ecdc()
 
@@ -58,5 +58,15 @@ fetch_latest_dpc <- function() {
   url <- "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv"
   filename <- "data/dpc-covid19-ita-province.csv"
   fetch_file(url, filename)
+  
+  d <- read.csv(filename)
+  #' Rename Italian column names
+  names(d)[names(d) == "data"] <- "date"
+  names(d)[names(d) == "denominazione_provincia"] <- "province"
+  names(d)[names(d) == "denominazione_regione"] <- "region"
+  names(d)[names(d) == "codice_provincia"] <- "province_code"
+  names(d)[names(d) == "codice_regione"] <- "region_code"
+  names(d)[names(d) == "totale_casi"] <- "total_cases"
+  write.csv(d, filename)
 }
 fetch_latest_dpc()
