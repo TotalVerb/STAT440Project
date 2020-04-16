@@ -21,6 +21,13 @@ model {
     beta[p] ~ normal(0, 1);
   }
 
+  // prior for epsilon (also very weak)
+  for (l in 1:L) {
+    for (t in 1:T) {
+      epsilon[l,t] ~ normal(0, 1);
+    }
+  }
+
   // likelihood
   for (l in 1:L) {
     for (t in 1:T) {
