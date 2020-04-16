@@ -68,8 +68,7 @@ cf_data <- list(
 )
 
 # fit stan model
-cf_fit <- sampling(cf_mod, data = cf_data, iter = 1000,
-                   verbose = TRUE, chains = 5)
+cf_fit <- sampling(cf_mod, data = cf_data, verbose = TRUE)
 
 save(cf_fit, file="data/cf_fit.rds")
 
