@@ -5,12 +5,13 @@ data {
   real<lower=0> w[T]; // serial interval distribution
   int<lower=0> i[T,L]; // number of infections
   real x[T,P,L]; // climate information
+  real pop[L];   // population information
 }
 parameters {
-  real alpha;                 // constant log(R0)
-  row_vector[P] beta;         // linear approximation for log(R) - log(RO)
-  matrix[L,T] epsilon;        // residual in data
-  real<lower=0> importations; // number of importations into each province on each day
+  real alpha;                    // constant log(R0)
+  row_vector[P] beta;            // linear approximation for log(R) - log(RO)
+  matrix[L,T] epsilon;           // residual in data
+  real<lower=0> importations;    // number of importations into each province on each day (per capita)
 }
 model {
   // prior for intercept (very weakly informative), R0 usually estimated around 2.5
@@ -28,6 +29,9 @@ model {
     }
   }
 
+  // prior for importations per capita [populations are not normalized]
+  importations ~ gamma(2e-5, 0);
+
   // likelihood
   for (l in 1:L) {
     for (t in 1:T) {
@@ -36,7 +40,7 @@ model {
       for (s in 1:(t-1)) {
         serials += w[s] * i[t-s, l];
       }
-      i[t,l] ~ poisson(R * serials + importations);
+      i[t,l] ~ poisson(R * serials + importations * pop[l]);
     }
   }
 }
