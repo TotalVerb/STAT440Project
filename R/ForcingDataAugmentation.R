@@ -2,6 +2,7 @@ library(restatapi)
 library(dplyr)
 library(worldmet)
 library(memoise)
+library(safejoin)
 
 # Obtain mapping of health ministry province names to eurostat codes
 
@@ -91,28 +92,41 @@ augmentDPCdemo <- function(dpc, demodata) {
   df
 }
 
-closestweatherstation <- function(lat, long) {
-  getMeta(lat = lat, lon = long, n = 1)$code[1]
+closestweatherstations <- function(lat, long, n) {
+  getMeta(lat = lat, lon = long, n = n)$code
 }
-closestweatherstationM <- memoise(closestweatherstation)
+closestweatherstationsM <- memoise(closestweatherstations)
 
 importNOAAM <- memoise(importNOAA)
 
-# Augment a single group of data points with weather, using just one station code.
+# Augment a single group of data points with weather, using a list of station codes.
 augmentsingleweather <- function(group, station) {
-  print(station$station[1])
-  noaa <- importNOAAM(code = station$station[1], year = 2020)
-  print(group)
-  print(noaa)
-  result <- left_join(group, noaa, by = "date")
-  print(result)
+  fallbacks <- strsplit(station$station[1], ",")
+  result <- group
+  for (code in fallbacks) {
+    print(paste("Looking up weather for ", code))
+    noaa <- importNOAAM(code = code, year = 2020)
+    result <- safe_left_join(result, noaa, by = "date", conflict = coalesce)
+    if (all(!is.na(result$air_temp)) & all(!is.na(result$RH))) {
+      break;
+    }
+  }
   select(result, -c("station"))
 }
 
 # Augment a table with date, lat, and long columns with weather data collected closest to the given time.
 augmentDPCweather <- function(dpc) {
   # 1. Find the appropriate station code for each latitude and longitude present in data.
-  dpc <- mutate(dpc, station = mapply(closestweatherstationM, lat = lat, long = long))
+  stations = mapply(
+    closestweatherstationsM,
+    lat = dpc$lat,
+    long = dpc$long,
+    MoreArgs = list(n = 5)
+  )
+  dpc <- mutate(
+    dpc,
+    station = apply(stations, 2, function (sts) { paste(sts, collapse=",", sep=",") })
+  )
   dpc <- mutate(dpc, date = as.POSIXct(data, format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
   dpc <- select(dpc, -c("data"))
   group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup

@@ -75,3 +75,6 @@ cf_fit <- sampling(cf_mod, data = cf_data, iter = 1000,
                    verbose = TRUE, chains = 5)
 
 save(cf_fit, file="data/cf_fit.rds")
+
+descr = c("temp", "RH", "GDP", "density")
+params <- rstan::extract(cf_fit)
