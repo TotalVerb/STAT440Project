@@ -18,7 +18,7 @@ model {
       for (s in 1:(t-1)) {
         serials += w[s] * i[t-s, l];
       }
-      i[l,t] ~ poisson(lambda * serials);
+      i[t,l] ~ poisson(lambda * serials);
     }
   }
 }

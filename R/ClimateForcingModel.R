@@ -25,7 +25,7 @@ df <- (
 )
 
 X <- abind(split(
-  select(df, c('date', 'air_temp', 'RH', 'gdppercapita', 'density')),
+  select(df, c('air_temp', 'RH', 'gdppercapita', 'density')),
   df$denominazione_provincia
 ), along=3)
 
@@ -47,7 +47,7 @@ cf_data <- list(
   T = nrow(I),
   w = w,
   i = I,
-  x = X
+  x = as.array(X)
 )
 
 # fit stan model
