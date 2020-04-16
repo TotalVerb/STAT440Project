@@ -1,19 +1,24 @@
 library(rstan)
 library(dplyr)
+library(tidyr)
 library(abind)
 
-# compile stan model
+# Compile stan model
 cf_mod <- stan_model("ClimateForcingModel.stan")
-
 save(cf_mod, file="data/cf_mod.rds")
 
 df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
-# TODO: this is probably duplicated work from somewhere
+
+# TODO:
+# This is probably duplicated work from the Thompson model. Try to merge the
+# codepaths that generate this df.
 df <- mutate(
   df,
   infections = coalesce(pmax(0, totale_casi - lag(totale_casi)), 0)
 )
-# Drop the locations with some NA in data (there should be none, TODO delete this code).
+
+# Drop the locations with some NA in data (there should be none, TODO: delete
+# this code).
 df <- (
   df
   %>% group_by(denominazione_provincia)
@@ -21,10 +26,12 @@ df <- (
   %>% ungroup
 )
 
-# TODO: also kind of a hack, need to figure out the best actual date to stop the analysis
-# Using peak of reported cases as a hack
+# Stop the analysis on Mar 13
 df <- filter(df, date <= "2020-03-13")
 
+# Standardize regressors.
+# TODO: Remember the original scale of the series so that the model coefficients
+# are interpretable.
 standardize <- function(series) {
   (series - mean(series)) / sd(series)
 }
@@ -36,6 +43,7 @@ df <- (
              std_density = standardize(density))
 )
 
+# Generate data for climate model.
 X <- abind(split(
   select(df, c('std_air_temp', 'std_RH', 'std_gdppercapita', 'std_density')),
   df$denominazione_provincia
@@ -45,16 +53,20 @@ I <- abind(split(df$infections, df$denominazione_provincia), along=2)
 
 pop <- abind(df %>% group_by(denominazione_provincia) %>% group_map(~ .x$population[1]), along=1)
 
-# TODO: use a correct discretized serial interval distribution
-w <- rep(0, nrow(I))
-w[1] <- 0.1
-w[2] <- 0.2
-w[3] <- 0.3
-w[4] <- 0.2
-w[5] <- 0.1
-w[6] <- 0.05
-w[7] <- 0.03
-w[8] <- 0.02
+#' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
+#' CMMID paper https://epiforecasts.io/covid/methods.html
+#' @param n The number of discrete dates in the future to compute a serial
+#'   interval density for.
+#' @param mean The estimated mean of the serial interval.
+#' @param sd The estimated standard distribution of the serial interval.
+#' @return A vector whose index corresponds to the number of days in the future,
+#'   and whose value corresponds to the density of the serial interval
+#'   distribution.
+getSIdist <- function(n, mean = 4.7, sd = 2.9) {
+  w <- dnorm(1:n, mean, sd)
+  w / sum(w)
+}
+w <- getSIdist(nrow(I))
 
 # stan data
 cf_data <- list(
@@ -71,6 +83,3 @@ cf_data <- list(
 cf_fit <- sampling(cf_mod, data = cf_data, verbose = TRUE)
 
 save(cf_fit, file="data/cf_fit.rds")
-
-descr = c("temp", "RH", "GDP", "density")
-params <- rstan::extract(cf_fit)
