@@ -92,7 +92,10 @@ plot_independentR <- function(params, cf_data) {
     ggplot(thetadf, aes(date, exp(logR), group = 1))
     + geom_smooth(stat = 'summary', fun.data = mean_cl_quantile)
     + ylab("R")
-    + ggtitle("Climate-independent basic R, by date")
+    + ggplot2::labs(
+      title = "Climate-independent basic R, by date",
+      subtitle = "Mean and 80% confidence interval"
+    )
     + theme(axis.text.x = element_text(angle = 90))
   )
 }
@@ -122,7 +125,10 @@ plot_locationR <- function(params, cf_data, loc, locname) {
     ggplot(thetadf, aes(date, exp(logR), group = 1))
     + geom_smooth(stat = 'summary', fun.data = mean_cl_quantile)
     + ylab("R")
-    + ggtitle(paste("Estimated R in", locname, "by date"))
+    + ggplot2::labs(
+      title = paste("Estimated R in", locname, "by date"),
+      subtitle = "Mean and 80% confidence interval"
+    )
     + theme(axis.text.x = element_text(angle = 90))
   )
 }
@@ -147,4 +153,5 @@ plot_lambda_confidence(cf_fit, 69, 102)
 plot_independentR(params, cf_data)
 plot_locationR(params, cf_data, 13, "Bergamo")
 plot_locationR(params, cf_data, 79, "Rome")
+plot_locationR(params, cf_data, 96, "Venezia")
 plot_epsilon_dispersion(params)
