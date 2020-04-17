@@ -162,6 +162,14 @@ $$
 Our technique is general and can be used for any epidemic and any combination of
 potential seasonal forcings.
 
+As the model is much more complex than the one in the Thompson et al. paper, we
+are unable to derive an analytic expression to compute the posterior. Instead,
+we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
+
+### Using OLS and EpiEstim to check results
+
+[TK: @Ben mention the OLS against EpiEstim ]
+
 ### Dataset
 
 [TK: retained from proposal, need to modify]
