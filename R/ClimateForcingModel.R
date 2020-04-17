@@ -9,15 +9,6 @@ save(cf_mod, file="data/cf_mod.rds")
 
 df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
 
-# Drop the locations with some NA in data (there should be none, TODO: delete
-# this code).
-df <- (
-  df
-  %>% group_by(province)
-  %>% filter(!any(is.na(air_temp)) & !any(is.na(RH)))
-  %>% ungroup
-)
-
 # Stop the analysis on Mar 13
 df <- filter(df, date < "2020-03-14")
 
@@ -39,7 +30,7 @@ df <- (
 # Generate data for climate model.
 X <- abind(split(
   select(df, c('std_air_temp', 'std_RH', 'std_gdppercapita', 'std_density')),
-  df$denominazione_provincia
+  df$province
 ), along=3)
 
 I <- abind(split(df$new_cases, df$province), along=2)

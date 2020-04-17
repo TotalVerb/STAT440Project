@@ -223,6 +223,7 @@ augmentsingleweather <- function(group, station) {
 }
 
 #' Augment a table with date, lat, and long columns with weather data collected closest to the given time.
+#' Warning: This function will be very slow, since it queries the NOAA database often.
 #'
 #' @param dpc Dataframe of DPC per province time series case data. Required columns: "date", "lat", "long".
 #' 

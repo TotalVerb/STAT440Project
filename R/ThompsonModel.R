@@ -35,13 +35,12 @@ for (province_name in province_names) {
   #' Therefore, the length of the date list and the mean list is off by 7.
   l = length(region_df$date)
   daily_R <- data.frame(date=region_df$date[1:(l-7)], mean_R=res_parametric_si$R$`Mean(R)`, province=province_name)
-  
-  #' Analysis Step 3: Linear Regression Against Climate (and other confounding variables).
-  #'
   merged_df <- merge(daily_R, region_df, by=c("date", "province"))
   all_provinces_df <- rbind(all_provinces_df, subset(merged_df, select=c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")))
 }
 
+#' Analysis Step 3: Linear Regression Against Climate (and other confounding variables).
+#'
 #' Cutoff on 2020-03-13, since intervention completely changes regime.
 all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
 fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
