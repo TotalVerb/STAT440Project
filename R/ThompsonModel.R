@@ -1,18 +1,22 @@
-#' Follows the Framework of the Thompson et al paper.
-#'
+#' Follows the Framework of the Thompson et al paper, while using OLS to predict R from climate similar to Wang et al.
+#' Primarily leverages the EpiEstim R package to perform MCMC and estimate R from time series.
+#' Requires some estimate of serial interval, which we simply use values from pervious papers for.
+#' 
 
 library(EpiEstim)
 library(ggplot2)
 
-#' Let's use the Italian Provincial datasets.
-#'
+#' Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.
 dpc_df <- read.csv("data/dpc-augmented.csv")
 dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")
 province_names <- unique(dpc_df$province)
 
+#' Prepare an empty dataframe to collect each province's daily R estimates.
 all_provinces_df <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")
 
+#' Compute the reproductive rate estimates for each province in our dataset.
+#'
 for (province_name in province_names) {
   region_df <- subset(dpc_df, province == province_name)
   
@@ -43,5 +47,7 @@ for (province_name in province_names) {
 #'
 #' Cutoff on 2020-03-13, since intervention completely changes regime.
 all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
+
+#' Perform linear regression on expected R against: GDP per capita, Density, Air Temperature, Relative Humidity.
 fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
 summary(fit)
