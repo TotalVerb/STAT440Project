@@ -3,6 +3,7 @@ library(dplyr)
 library(worldmet)
 library(memoise)
 library(lubridate)
+library(R.utils)
 
 #' Fetches a raw file from url, and saves it to a filename.
 #' For proper style, filename string should begin with "data/".
