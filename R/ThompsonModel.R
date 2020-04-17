@@ -4,17 +4,29 @@
 #'
 
 library(EpiEstim)
-library(ggplot2)
+library(dplyr)
 
 #' Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.
-runThompson <- function() {
-  dpc_df <- read.csv("data/dpc-augmented.csv")
+#' 
+#' @param filename The path to the augmented data file which we will be using.
+#' @return Fit object, result of linear regression on log(R) against confounding variables.
+runThompson <- function(filename = "data/dpc-augmented.csv") {
+  dpc_df <- read.csv(filename)
   dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")
   province_names <- unique(dpc_df$province)
 
   #' Prepare an empty dataframe to collect each province's daily R estimates.
   all_provinces_df <- data.frame(matrix(ncol = 7, nrow = 0))
   colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")
+  
+  #' Standardize each of the variables.
+  dpc_df <- (
+    dpc_df
+    %>% mutate(air_temp = scale(air_temp),
+               RH = scale(RH),
+               gdppercapita = scale(gdppercapita),
+               density = scale(density))
+  )
 
   #' Compute the reproductive rate estimates for each province in our dataset.
   #'
@@ -24,14 +36,14 @@ runThompson <- function() {
     #' Analysis Step 1: Estimate the serial interval
     #'
     #' We have determined that it is difficult to find the line-list data for COVID-19, and thus will be using
-    #' the mean and standard deviation
+    #' the mean and standard deviation used by Abbott et al (2020).
     est_mean_si = 4.7
     est_std_si = 2.9
 
     #' Analysis Step 2: Estimate the reproduction rate.
     #'
     res_parametric_si <- estimate_R(region_df$new_cases,
-          method="parametric_si",
+          method = "parametric_si",
           config = make_config(list(
             mean_si = est_mean_si,
             std_si = est_std_si)))
@@ -49,8 +61,12 @@ runThompson <- function() {
   #' Cutoff on 2020-03-13, since intervention completely changes regime.
   all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
 
+  #' Take logarithm of mean_R.
+  all_provinces_df$mean_R <- log(all_provinces_df$mean_R)
+  
   #' Perform linear regression on expected R against: GDP per capita, Density, Air Temperature, Relative Humidity.
   fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
-  summary(fit)
   save(fit, file="data/thompson_fit.rds")
+  fit
 }
+
