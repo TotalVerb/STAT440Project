@@ -51,3 +51,6 @@ all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
 #' Perform linear regression on expected R against: GDP per capita, Density, Air Temperature, Relative Humidity.
 fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
 summary(fit)
+
+save(fit, file="data/thompson_fit.rds")
+
