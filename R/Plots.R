@@ -16,7 +16,7 @@ plot_beta_confidence <- function(cf_fit) {
       regex_pars = c("beta.+"),
       point_est = "mean"
     ) + ggplot2::labs(title = "Posterior of β, magnitude of climate forcings",
-                      subtitle = paste("Each standardized; in order:", betadescr)
+                      subtitle = paste("Each standardized; in order:", betadescr))
   )
 }
 
@@ -142,15 +142,16 @@ plot_epsilon_dispersion <- function(params) {
 }
 
 # TODO: move these to the Rmarkdown file
-
-plot_beta_confidence(cf_fit)
-plot_lambda_confidence(cf_fit, 1, 34)
-plot_lambda_confidence(cf_fit, 35, 68)
-plot_lambda_confidence(cf_fit, 69, 102)
-plot_independentR(params, cf_data)
-plot_locationR(params, cf_data, 13, "Bergamo")
-plot_locationR(params, cf_data, 55, "Milano")
-plot_locationR(params, cf_data, 79, "Rome")
-plot_locationR(params, cf_data, 96, "Venezia")
-plot_locationR(params, cf_data, 99, "Verona")
-plot_epsilon_dispersion(params)
+generate_plots <- function() {
+  plot_beta_confidence(cf_fit)
+  plot_lambda_confidence(cf_fit, 1, 34)
+  plot_lambda_confidence(cf_fit, 35, 68)
+  plot_lambda_confidence(cf_fit, 69, 102)
+  plot_independentR(params, cf_data)
+  plot_locationR(params, cf_data, 13, "Bergamo")
+  plot_locationR(params, cf_data, 55, "Milano")
+  plot_locationR(params, cf_data, 79, "Rome")
+  plot_locationR(params, cf_data, 96, "Venezia")
+  plot_locationR(params, cf_data, 99, "Verona")
+  plot_epsilon_dispersion(params)
+}
