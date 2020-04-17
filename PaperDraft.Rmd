@@ -186,7 +186,7 @@ The baseline model we build estimates the reproductive rate using a parametric S
 
 ### Directions for Future Research
 
-One particularly counterintuitive result in 
+One particularly counterintuitive result in de
 
 With our `cfc19i` library, it is 
 

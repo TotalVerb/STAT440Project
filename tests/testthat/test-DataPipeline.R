@@ -1,3 +1,5 @@
+library(dplyr)
+
 test_that("transform total cases works", {
   province <- c(rep("A", 9), rep("B", 9))
   dateraw <- c(paste("2020-01-0", 1:9, sep=""))
