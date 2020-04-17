@@ -4,7 +4,7 @@ library(tidyr)
 library(abind)
 
 #' Compile the stan model, run MCMC, and save results.
-#' @param cutoff The cutoff date (default: CUTOFF_DATE).
+#' @param cutoff The cutoff date (default: Mar 14).
 function runMCMC(cutoff = "2020-03-14") {
   cf_mod <- stan_model("ClimateForcingModel.stan")
   save(cf_mod, file="data/cf_mod.rds")
@@ -68,6 +68,7 @@ function runMCMC(cutoff = "2020-03-14") {
   # fit stan model
   cf_fit <- sampling(cf_mod, data = cf_data, verbose = TRUE)
 
+  save(unique(df$date), file="data/cf_dates.rds")
   save(cf_fit, file="data/cf_fit.rds")
   save(cf_data, file="data/cf_data.rds")
 
