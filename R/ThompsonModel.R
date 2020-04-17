@@ -10,10 +10,10 @@ dpc_df <- read.csv("data/dpc-covid19-ita-province.csv")
 province_names <- unique(dpc_df$province)
 
 all_provinces_df <- data.frame(matrix(ncol = 7, nrow = 0))
-colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita","density","air_temp","dew_point")
+colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")
 
 augmented_df <- read.csv("data/dpc-augmented.csv")
-variables_df <- subset(augmented_df, select=c("denominazione_provincia", "gdppercapita", "density", "date", "air_temp", "dew_point"))
+variables_df <- subset(augmented_df, select=c("denominazione_provincia", "gdppercapita", "density", "date", "air_temp", "RH"))
 names(variables_df)[names(variables_df) == "denominazione_provincia"] <- "province"
 variables_df$date <- as.Date(variables_df$date, format = "%Y-%m-%d")
 
@@ -27,10 +27,10 @@ for (province_name in province_names) {
   
   #' Analysis Step 1: Estimate the serial interval
   #'
-  #' Let's just put these placeholders in here.
-  
-  est_mean_si = 2.5
-  est_std_si = 1
+  #' We have determined that it is difficult to find the line-list data for COVID-19, and thus will be using
+  #' the mean and standard deviation 
+  est_mean_si = 4.7
+  est_std_si = 2.9
   
   #' Analysis Step 2: Estimate the reproduction rate.
   #'
@@ -51,6 +51,10 @@ for (province_name in province_names) {
   all_provinces_df <- rbind(all_provinces_df, merged_df)
 }
 
-all_provinces_df
-fit <- lm(mean_R ~ gdppercapita + density + air_temp + dew_point, data=all_provinces_df)
-summary(fit) # show results
+#' Cutoff on 2020-03-13, since intervention completely changes regime.
+all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
+fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
+summary(fit)
+
+# Produce good plots for the 
+#
