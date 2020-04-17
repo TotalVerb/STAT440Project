@@ -9,7 +9,7 @@ library(dplyr)
 #' Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.
 #' 
 #' @param filename The path to the augmented data file which we will be using.
-#' @return Fit object, result of linear regression on log(R) against confounding variables.
+#' @return Fit object, result of linear regression on log(R) against standardized confounding variables.
 runThompson <- function(filename = "data/dpc-augmented.csv") {
   dpc_df <- read.csv(filename)
   dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")

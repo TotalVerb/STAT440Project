@@ -1,6 +1,6 @@
 Package: cfc19i
-Title: Contains software for modeling climate forcings on the early stages of the COVID-19 outbreak in Italy.
-Version: 0.0.0.9000
+Title: Climate Forcing effects on COVID-19 Italy
+Version: 0.0.1.9000
 Authors@R: 
     person(given = "Joanna",
            family = "Lu",
@@ -15,11 +15,22 @@ Authors@R:
            family = "Zhang",
            email = "yxbzhang@gmail.com",
            role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Contains software for modeling climate forcings on the early stages of the COVID-19 outbreak in Italy.
 License: use_mit_license()
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+Imports:
+    dplyr,
+    EpiEstim,
+    restatapi,
+    worldmet,
+    memoise,
+    lubridate,
+    R.utils,
+    rstan,
+    tidyr,
+    abind
 Suggests: 
     testthat
