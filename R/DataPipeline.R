@@ -206,6 +206,8 @@ closestweatherstationsM <- memoise(closestweatherstations)
 importNOAAM <- memoise(importNOAA)
 
 #' Augment a single group of data points with weather, using a list of station codes.
+#' Query each station code for air temperature, dewpoint, and relative humidity, taking the closest result that is not NA.
+#' 
 #' @param group A dataframe groupby object on a particular province, which we are pulling weather data for.
 #' @param station A comma separated string of station codes, which are used by importNOAA to query for weather data from those stations.
 #'
@@ -223,6 +225,7 @@ augmentsingleweather <- function(group, station) {
   )
   left_join(group, noaa, by = "date")
 }
+
 
 #' Augment a table with date, lat, and long columns with weather data collected
 #' closest to the given time. **Warning**: This function will be very slow,
@@ -275,7 +278,8 @@ robust <- function(f, timeout = 60) {
 }
 
 #' Repair total case data to be monotonically increasing, through taking a rolling maximum.
-#' Also drop the last date as it is likely to have no weather data for each location.
+#' Drop the last date as it is likely to have no weather data for each location.
+#' Add new_cases column which contains the number of new cases each day.
 #'
 #' @param dpc Dataframe of DPC per province timeseries. Requires the columns: "date", "province", "total_cases".
 #'
