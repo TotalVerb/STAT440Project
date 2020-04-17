@@ -87,10 +87,6 @@ fetch_latest_dpc <- function() {
   write.csv(d, filename)
 }
 
-fetch_latest_ecdc()
-fetch_latest_dpc()
-fetch_latest_csse()
-
 #' Obtain mapping of health ministry province names to eurostat codes
 #'
 #' @return Dataframe of italian provinces with columns "name", "code".
@@ -298,18 +294,33 @@ repairtotalcases <- function(dpc) {
   )
 }
 
-#' Code which augments the Italian per province data with GDP, weather, density data.
-#'
-demodata <- getdemodata()
-dpc <- read.csv("data/dpc-covid19-ita-province.csv")
-df <- repairtotalcases(dpc)
-df <- augmentDPCdemo(df, demodata)
-df <- robust(augmentDPCweather, timeout=120)(df)
-write.csv(demodata, "data/demodata.csv")
-write.csv(df, "data/dpc-augmented.csv")
+#' Augments the Italian per province data with GDP, weather, density data.
+#' Produces a file data/dpc-augmented.csv which contains the required data for
+#' this analysis.
+#' @param rewriteall Attempt to refresh all files even if already exist. If
+#'   TRUE, this function may need to be called multiple times due to `worldmet`
+#'   issues.
+collectData <- function(rewriteall = FALSE) {
+  fetch_latest_ecdc()
+  fetch_latest_dpc()
+  fetch_latest_csse()
 
-# test: check that no provinces weren't mapped to demographic data
-stopifnot(nrow(filter(df, is.na(density))) == 0)
+  if (rewriteall | !file.exists("data/demodata.csv")) {
+    demodata <- getdemodata()
+    write.csv(demodata, "data/demodata.csv")
+  }
 
-# test: check no temperature NAs
-stopifnot(nrow(filter(df, is.na(air_temp))) == 0)
+  if (rewriteall | !file.exists("data/dpc-augmented.csv")) {
+    dpc <- read.csv("data/dpc-covid19-ita-province.csv")
+    df <- repairtotalcases(dpc)
+    df <- augmentDPCdemo(df, demodata)
+    df <- robust(augmentDPCweather, timeout=120)(df)
+    write.csv(df, "data/dpc-augmented.csv")
+
+    # test: check that no provinces weren't mapped to demographic data
+    stopifnot(nrow(filter(df, is.na(density))) == 0)
+
+    # test: check no temperature NAs
+    stopifnot(nrow(filter(df, is.na(air_temp))) == 0)
+  }
+}
