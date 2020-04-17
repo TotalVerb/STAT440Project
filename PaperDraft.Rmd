@@ -186,10 +186,13 @@ The baseline model we build estimates the reproductive rate using a parametric S
 
 ### Directions for Future Research
 
-[TK: retained from proposal, need to modify]
+One particularly counterintuitive result in 
 
-- Looking at the climate and infection data in American and Canadian cities as the situation develops further. In particular, compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, try fitting while assuming a nonlinear relationship between $R$ and seasonal factors.
-- Look into statistical simulation models which consider intercity travel and geographic proximity.
+With our `cfc19i` library, it is 
+
+Looking at the climate and infection data in American and Canadian cities as the situation develops further. In particular, compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, try fitting while assuming a nonlinear relationship between $R$ and seasonal factors.
+
+Look into statistical simulation models which consider intercity travel and geographic proximity.
 
 ## Appendix
 
