@@ -239,7 +239,7 @@ augmentDPCweather <- function(dpc) {
     dpc,
     station = apply(stations, 2, function (sts) { paste(sts, collapse=",", sep=",") })
   )
-  dpc <- mutate(dpc, date = as.POSIXct("date", format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
+  dpc <- mutate(dpc, date = as.POSIXct(date, format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
   group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup
 }
 
@@ -253,10 +253,12 @@ repairtotalcases <- function(dpc) {
   (dpc
    %>% group_by(province)
    %>% group_modify(~ arrange(.x, by=date) %>% mutate(total_cases = cummax(total_cases)))
+   %>% mutate(new_cases = c(0, diff(total_cases)))
    %>% ungroup
    %>% filter(date != max(as.character(date)))
   )
 }
+
 
 #' Code which augments the Italian per province data with GDP, weather, density data.
 #' 

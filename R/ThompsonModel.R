@@ -6,23 +6,15 @@ library(ggplot2)
 
 #' Let's use the Italian Provincial datasets.
 #'
-dpc_df <- read.csv("data/dpc-covid19-ita-province.csv")
+dpc_df <- read.csv("data/dpc-augmented.csv")
+dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")
 province_names <- unique(dpc_df$province)
 
 all_provinces_df <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")
 
-augmented_df <- read.csv("data/dpc-augmented.csv")
-variables_df <- subset(augmented_df, select=c("province", "gdppercapita", "density", "date", "air_temp", "RH"))
-variables_df$date <- as.Date(variables_df$date, format = "%Y-%m-%d")
-
 for (province_name in province_names) {
-  region_df <- subset(dpc_df, province == province_name, select = c("date", "total_cases"))
-  
-  #' Add a "new cases" column for per-day data.
-  region_df <- within(region_df, new_cases <- c(0, diff(total_cases)))
-  region_df$new_cases[region_df$new_cases<0] <- 0
-  region_df$date <- as.Date(region_df$date, format = "%Y-%m-%d")
+  region_df <- subset(dpc_df, province == province_name)
   
   #' Analysis Step 1: Estimate the serial interval
   #'
@@ -46,14 +38,11 @@ for (province_name in province_names) {
   
   #' Analysis Step 3: Linear Regression Against Climate (and other confounding variables).
   #'
-  merged_df <- merge(daily_R, variables_df, by=c("date", "province"))
-  all_provinces_df <- rbind(all_provinces_df, merged_df)
+  merged_df <- merge(daily_R, region_df, by=c("date", "province"))
+  all_provinces_df <- rbind(all_provinces_df, subset(merged_df, select=c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")))
 }
 
 #' Cutoff on 2020-03-13, since intervention completely changes regime.
 all_provinces_df <- subset(all_provinces_df, date <= "2020-03-13")
 fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
 summary(fit)
-
-# Produce good plots for the 
-#

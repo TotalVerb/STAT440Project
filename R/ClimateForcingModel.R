@@ -9,19 +9,11 @@ save(cf_mod, file="data/cf_mod.rds")
 
 df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
 
-# TODO:
-# This is probably duplicated work from the Thompson model. Try to merge the
-# codepaths that generate this df.
-df <- mutate(
-  df,
-  infections = coalesce(pmax(0, totale_casi - lag(totale_casi)), 0)
-)
-
 # Drop the locations with some NA in data (there should be none, TODO: delete
 # this code).
 df <- (
   df
-  %>% group_by(denominazione_provincia)
+  %>% group_by(province)
   %>% filter(!any(is.na(air_temp)) & !any(is.na(RH)))
   %>% ungroup
 )
@@ -50,9 +42,9 @@ X <- abind(split(
   df$denominazione_provincia
 ), along=3)
 
-I <- abind(split(df$infections, df$denominazione_provincia), along=2)
+I <- abind(split(df$new_cases, df$province), along=2)
 
-pop <- abind(df %>% group_by(denominazione_provincia) %>% group_map(~ .x$population[1]), along=1)
+pop <- abind(df %>% group_by(province) %>% group_map(~ .x$population[1]), along=1)
 
 #' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
 #' CMMID paper https://epiforecasts.io/covid/methods.html
