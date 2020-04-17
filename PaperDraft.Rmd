@@ -10,6 +10,8 @@ output:
 
 ## Introduction
 
+[TK: this is retained from Proposal, modify]
+
 Exponential growth of the number of symptomatic cases is usually observed in the initial stages of infectious disease epidemics. Typically, the rate of this growth is decomposed into two quantities:
 
 - The serial interval: time between onset of symptoms of two adjacent individuals in a transmission chain
@@ -21,35 +23,148 @@ Many infectious diseases are believed to be seasonal, including most respiratory
 
 ## Methodology
 
-### Bayesian Framework for Estimation of Time-Varying $R$
+Thompson et al. (2019) outline a Bayesian framework for estimation of $R(t)$
+using symptomatic case counts, decomposed into local and imported cases. The
+EpiEstim R package implements ideas from this paper. A simplified summary of
+their approach, ignoring the imported cases:
 
-Thompson et al. (2019) outline a Bayesian framework for estimation of $R(t)$ using symptomatic case counts, decomposed into local and imported cases. The EpiEstim R package implements ideas from this paper. A simplified summary of their approach, ignoring the imported cases:
+1. Estimation of (discrete) distribution of serial interval from line-list data
+   with intervals reflecting date of infection.
+2. Estimation of time-varying $R$ from time-bucketed symptomatic case counts.
 
-- Estimation of (discrete) distribution of serial interval: Our project does not extend this portion, which estimates the quantities ws that denote the probability density of interval length s under a posterior distribution for the serial interval.
-- Estimation of time-varying $R$: Data is collected containing the number of symptomatic cases observed at time $t$: $I(t)$. The observed number of cases at each timestep is assumed to be drawn from a Poisson distribution:
+We developed a method to estimate the strength of various seasonal forcings on
+$R$ through MCMC. This involves both substantial deviations from the second part
+of the Thompson et al. model and also less less substantial adjustments for the
+nature of our data. Our method does not extend the first part of the Thompson et
+al. model.
 
-$$ I(t) \space | \space  I(1), \cdots ,I(t-1),w,R(t) \sim \text{Poisson} \left(R(t) \sum_{s=1}^t I(t-s)w_s \right) $$
+To sanity-check the results of our method, we compare its conclusions against a
+point estimate for the seasonal forcings through linear regression with the
+EpiEstim estimates of $R$.
 
-Then Bayesian inference can be used to compute the posterior distribution of $R(t)$ conditional on the data and the serial interval distribution. (In the Thompson et al. paper, a gamma-distributed prior for $R(t)$ [the conjugate prior for a Poisson likelihood] and a convenient serial interval distribution was chosen so that this posterior is proportional to an analytic expression.)
+### Incidence likelihood of the Thompson et al. model
+
+In its estimation of time-varying $R$, the Thompson et al. model uses the
+following likelihood function for the number of new infections at time $t$:
+
+$$ I(t) \space | \space  I(1), \cdots ,I(t-1),\mathbf{w},R(t) \sim \text{Poisson} \left(R(t) \sum_{s=1}^t I(t-s)w_s \right) $$
+
+where
+
+- $I(t)$ is observed data containing the number of new infections at time $t$
+- $R(t)$ is a parameter for the reproduction number at time $t$
+- $w_s$ denotes the proportion of serial intervals which take on discrete value
+  $s$, i.e. $w_s = \operatorname{P}(\mathrm{SI} = s)$.
+
+Because the Thompson et al. model uses a gamma-distributed prior for $R(t)$ (the
+conjugate prior for a Poisson likelihood) and because they chose a convenient
+family of serial interval distributions, the Bayesian posterior in the Thompson
+et al. model can be described by a closed form analytic expression.
 
 ### Extension of Thompson et al. for $R$ subject to forcings
 
-Our proposal is to extend the method of Thompson et al. to multiple locations, each with its own incidence time series $I_1(t),\cdots,I_n(t)$ such that
+Our Bayesian model extends the method of Thompson et al. to multiple locations,
+each with its own incidence time series $I_1(t),\cdots,I_n(t)$ such that
 
-$$ R_i(t) = \beta^T x_i(t) + \varepsilon_i(t) $$
+$$ R_i(t) = \exp\left( \theta(t) + \lambda_i + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)$$
 
-where $\beta$ is a parameter describing the locally linear effect of each seasonal forcing, $x_i(t)$ is a vector of observed seasonal factors at time $t$ and location $i$, and $\varepsilon_i(t)$ denotes the component of $R_i(t)$ not linearly predicted by seasonal conditions at location $i$.  and the serial interval distribution $(w_s)_{s \geq 1}$ are assumed to be characteristics of the disease independent of location. The observed number of cases at each timestep is
+where:
 
-$$ I_i(t) \space | \space I_i(1), \cdots ,I_i(t-1),w,x_i(t), \varepsilon_i(t) \sim \text{Poisson} \left( (\beta^Tx_i(t)+ \varepsilon_i(t)) \sum_{s=1}^t I(t-s) w_s \right) $$
+- $x_i(t)$ is data of observed seasonal factors at time $t$ and location $i$,
+  with each feature standardized to mean $0$ and variance $1$
+- $\beta$ is a parameter describing the locally linear effect of each seasonal
+  forcing
+- $\theta(t)$ is a parameter for logarithm of country-wide $R$ independent of
+  modeled seasonal forcings
+- $\lambda_i$ is a parameter for local variation of $\log R$ independent of
+  modeled seasonal forcings
+- $\varepsilon_i(t)$ is a parameter for remaining fluctuation in $\log R$ not
+  modeled above
 
-Here the parameter of interest is $\beta$ and the $\varepsilon_i(t)$ are nuisance variables. We propose to use Markov chain Monte Carlo to compute a joint distribution over all the parameters and marginalize over the $\varepsilon_i(t)$.
-Because of concerns over confounding factors that may affect $R$ and are correlated with temperature and humidity, we plan to add several other features to $x(t)$ to help control for these factors. We also need to restrict the analysis to the pre-lockdown regime in each province, because the lockdown is likely to change the magnitude of seasonal forcings.
+Unlike the Thompson et al., our analysis fundamentally estimates the logarithm
+of $R$ instead of $R$ itself. This has some practical advantages: a linear model
+for $R$ could predict negative values for sufficiently extreme climate
+conditions, but negative values for $R$ do not make sense epidemiologically.
 
-- Time (days)
-- GDP per capita
-- Population density
+We maintain a very similar incidence likelihood function as the Thompson et al.
+model, but impose an additional correction for importations:
+
+$$
+I_i(t) \space |
+\space P_i,x_i(t),I_i(1), \cdots ,I_i(t-1),\mathbf{w},\theta(t),\lambda_i,\mathbf{\beta},\mathbf{\varepsilon}(t),\gamma
+\sim \text{Poisson} \left(\gamma P_i + R_i(t) \sum_{s=1}^t I_i(t-s)w_s \right)
+$$
+
+where in addition to the parameters described (with $R_i(t)$ given by the
+equation above), the following additional data and parameters are introduced:
+
+- $P_i$ is data giving the population of location $i$
+- $\gamma$ is a parameter estimating the nationwide rate of imports per capita
+per day, on which we impose prior $\gamma \sim \operatorname{Gamma}(2, 10^{-5})$
+
+The only substantative change to this likelihood function, beyond the
+decomposition of $R_i(t)$ into the various parameters influencing it, is the
+addition of importation risk. The reason for this adjustment is that the dataset
+we are using does not distinguish between importations and local cases. Thus,
+the Thompson likelihood would be $0$ upon detection of the first case, had we
+not modeled the importations separately.
+
+The most important feature of our model is the parameter $\mathbf{\beta}$ which
+are the coefficients of the linear model of $\log R$. This feature is assumed to
+be global across all locations and times, and thus models inherent properties of
+the contagiousness of the outbreak, as opposed to local deviations in space or
+time.
+
+To avoid the model ascribing deviations in $R$ to the seasonal forcings without
+widespread evidence across locations and times, three other features of our
+model are the parameters $\theta(t)$, $\lambda_i$, and $\varepsilon_i(t)$. The
+first parameter, $\theta(t)$, describes the logarithm country-wide $R$ before
+adjusting for location and climate and local idiosyncratic factors. That is, it
+can be thought of as a baseline $R$ value affected simply by the national
+circumstances at the given time; such as national policies or human behavioral
+changes. This will encapsulate various unmodeled behaviours such as weekends or
+interventions. At time zero, our prior belief is that this $R$ will match the
+consensus of international estimates for $R_0$, which vary widely but tend to
+cluster between $2$ or $3$ [TK: Citation needed?]. Because of the great
+uncertainty, there is significant variance in this assumption, so the prior is
+quite weak (note that the $\mu \pm 2\sigma$ values, when transformed
+exponentially, are below $1$ and above $6$ respectively).
+
+$$
+\theta(0) \sim \operatorname{Normal}(\log 2.5, 0.5^2)
+$$
+
+The remaining days of $\theta$ are modeled using a simple autoregressive model:
+
+$$
+\theta(t+1) \sim \operatorname{Normal}(\theta(t), \theta^\sigma)
+$$
+
+where $\theta^\sigma$ is a parameter describing the spread of daily drifts in
+$\theta$. The prior on $\theta^\sigma$ is weakly informative:
+
+$$
+\theta^\sigma \sim \operatorname{Gamma}(2, 0.01)
+$$
+
+The location-specific deviation from the country average in $\log R$ independent
+of modeled seasonal forcings is encoded in $\lambda_i$. The existence of this
+parameter helps the model explain the large variations of apparent $R$ across
+different locations, some of which appear to be affected much more so than
+others. The remaining parameter $\varepsilon_i(t)$ encapsulates all other
+unexplained deviations across both time and location. All these parameters (and
+$\beta$) are given the following weakly informative prior:
+
+$$
+\lambda_i, \varepsilon_i(t), \beta_k \sim \operatorname{Normal}(0, 0.5)
+$$
+
+Our technique is general and can be used for any epidemic and any combination of
+potential seasonal forcings.
 
 ### Dataset
+
+[TK: retained from proposal, need to modify]
 
 - The Italian government dataset at https://github.com/pcm-dpc/COVID-19 contains the disease incidence for each province. This data contains date of confirmation instead of date of onset of symptoms, and so some procedure may be necessary to correct for this. Abbott et al. (2020) outlines a technique to correct for reporting delays using an exponential distribution of reporting delay fit to line list data; we may use the same distribution.
 - The `worldmet` R package enables access to temperature and humidity data, sourced from NOAA.
@@ -59,6 +174,8 @@ Because of concerns over confounding factors that may affect $R$ and are correla
 ## Discussion
 
 ### Directions for Future Research
+
+[TK: retained from proposal, need to modify]
 
 - Looking at the climate and infection data in American and Canadian cities as the situation develops further. In particular, compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, try fitting while assuming a nonlinear relationship between $R$ and seasonal factors.
 - Look into statistical simulation models which consider intercity travel and geographic proximity.
