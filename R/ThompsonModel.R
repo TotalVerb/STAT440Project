@@ -13,8 +13,7 @@ all_provinces_df <- data.frame(matrix(ncol = 7, nrow = 0))
 colnames(all_provinces_df) <- c("date", "province", "mean_R", "gdppercapita", "density", "air_temp","RH")
 
 augmented_df <- read.csv("data/dpc-augmented.csv")
-variables_df <- subset(augmented_df, select=c("denominazione_provincia", "gdppercapita", "density", "date", "air_temp", "RH"))
-names(variables_df)[names(variables_df) == "denominazione_provincia"] <- "province"
+variables_df <- subset(augmented_df, select=c("province", "gdppercapita", "density", "date", "air_temp", "RH"))
 variables_df$date <- as.Date(variables_df$date, format = "%Y-%m-%d")
 
 for (province_name in province_names) {

@@ -92,6 +92,7 @@ fetch_latest_csse()
 
 #' Obtain mapping of health ministry province names to eurostat codes
 #'
+#' @return Dataframe of italian provinces with columns "name", "code".
 getprovincelist <- function() {
   # The island of Sardinia was reorganized between collection of the demographic data and
   # the health ministry's collection of COVID-19 data, so demographic data does not map
@@ -126,27 +127,32 @@ getprovincelist <- function() {
 #' Fetch GDP per capita data and population density data for Italian provinces
 #' Source: Eurostat
 #'
+#' @return Eurostat dataframe with columns "name", "gdppercapita", "density", "population".
 getdemodata <- function() {
   itprovinces <- getprovincelist()
   
+  #' Get GDP/capita data from Eurostat.
+  #'
   gdppercapita <- filter(get_eurostat_data(
-    "nama_10r_3gdp",
+    "nama_10r_3gdp", # Specific column code for GDP per capital from Eurostat documentation.
     date_filter="2017",
     filters=itprovinces$code
   ), unit == "EUR_HAB")
   gdppercapita <- select(gdppercapita, c("geo", "values"))
   gdppercapita$geo <- as.character(gdppercapita$geo)
   
+  #' Get population density data from Eurostat.
   density <- get_eurostat_data(
-    "demo_r_d3dens",
+    "demo_r_d3dens", # Specific column code for density from Eurostat documentation.
     date_filter="2017",
     filters=itprovinces$code
   )
   density <- select(density, c("geo", "values"))
   density$geo <- as.character(density$geo)
   
+  #' Get population data from Eurostat.
   population <- filter(get_eurostat_data(
-    "demo_r_pjangrp3",
+    "demo_r_pjangrp3", # Specific column code for population from Eurostat documentation.
     date_filter="2017",
     filters=itprovinces$code
   ), sex == "T" & age == "TOTAL")
@@ -167,31 +173,45 @@ getdemodata <- function() {
   full_join(df, itprovinces, by = c("geo" = "code"))
 }
 
-# Augment Italy DPC data with demographics
-# Also remove Sardinia provinces
+#' Augment Italy DPC data with demographics, and also removes Sardinia provinces
+#' 
+#' @param dpc Italian per province timeseries data.
+#' @param demodata Dataframe sourced from Eurostat that contains GDP per Capita and Density information on Italian regions.
+#' 
+#' @return Augmented dataframe that contains both COVID-19 cases timeseries and eurostats.
 augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, lat != 0)  # not regional data
   dpc <- filter(dpc, region != "Sardegna")
   
   df <- left_join(dpc, demodata, by = c("province" = "name"))
-  df <- select(df, c("data", "province", "lat", "long", "gdppercapita", "density", "cases", "population"))
+  df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "population"))
   df
 }
 
-#' Get the closest weather station to a latitude longitude point.
+#' Get the closest weather stations to a latitude longitude point.
 #' 
 #' @param lat Latitude
 #' @param long Longitude
-#' @param n 
-#'
+#' @param n Number of weather stations to get.
+#' 
+#' @return The codes of the closest weather stations in a list format.
 closestweatherstations <- function(lat, long, n) {
-  f(lat = lat, lon = long, n = n)$code
+  getMeta(lat = lat, lon = long, n = n)$code
 }
+
+#' Memoized equivalent of functions, such that repeated function calls are efficient.
+#'
 closestweatherstationsM <- memoise(closestweatherstations)
 
+#' ImportNOAA is a function exposed in "worldmet" library. Gets data from weather stations.
+#'
 importNOAAM <- memoise(importNOAA)
 
-# Augment a single group of data points with weather, using a list of station codes.
+#' Augment a single group of data points with weather, using a list of station codes.
+#' @param group A dataframe groupby object on a particular province, which we are pulling weather data for.
+#' @param station A comma separated string of station codes, which are used by importNOAA to query for weather data from those stations.
+#' 
+#' @return Augmented dataframe groupby object which now contains "air_temp", "RH", "dewpoint" as columns.
 augmentsingleweather <- function(group, station) {
   fallbacks <- strsplit(station$station[1], ",")[[1]]
   print(paste("Looking up weather for", fallbacks))
@@ -202,7 +222,11 @@ augmentsingleweather <- function(group, station) {
   left_join(group, noaa, by = "date")
 }
 
-# Augment a table with date, lat, and long columns with weather data collected closest to the given time.
+#' Augment a table with date, lat, and long columns with weather data collected closest to the given time.
+#'
+#' @param dpc Dataframe of DPC per province time series case data. Required columns: "date", "lat", "long".
+#' 
+#' @return Transformed dataframe with new columns added: "air_temp", "dewpoint", "RH".
 augmentDPCweather <- function(dpc) {
   # 1. Find the appropriate station code for each latitude and longitude present in data.
   stations = mapply(
@@ -215,23 +239,27 @@ augmentDPCweather <- function(dpc) {
     dpc,
     station = apply(stations, 2, function (sts) { paste(sts, collapse=",", sep=",") })
   )
-  dpc <- mutate(dpc, date = as.POSIXct(data, format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
-  dpc <- select(dpc, -c("data"))
+  dpc <- mutate(dpc, date = as.POSIXct("date", format="%Y-%m-%dT%H:%M:%S", tz = "Europe/Rome"))
   group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup
 }
 
-# Repair total case data to be monotonically increasing, through taking a rolling maximum.
-# Also drop the last date as it is likely to have no weather data for each location.
+#' Repair total case data to be monotonically increasing, through taking a rolling maximum.
+#' Also drop the last date as it is likely to have no weather data for each location.
+#' 
+#' @param dpc Dataframe of DPC per province timeseries. Requires the columns: "date", "province", "total_cases".
+#' 
+#' @return Transformed dataframe with modified "total_cases" column, where the column is now monotonically increasing.
 repairtotalcases <- function(dpc) {
   (dpc
    %>% group_by(province)
-   %>% group_modify(~ arrange(.x, by = data) %>% mutate(total_cases = cummax(total_cases)))
+   %>% group_modify(~ arrange(.x, by=date) %>% mutate(total_cases = cummax(total_cases)))
    %>% ungroup
-   %>% filter(data != max(as.character(data)))
+   %>% filter(date != max(as.character(date)))
   )
 }
 
-# test code
+#' Code which augments the Italian per province data with GDP, weather, density data.
+#' 
 demodata <- getdemodata()
 dpc <- read.csv("data/dpc-covid19-ita-province.csv")
 df <- repairtotalcases(dpc)
