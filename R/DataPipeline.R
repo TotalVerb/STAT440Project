@@ -7,7 +7,7 @@ library(lubridate)
 #' Fetches a raw file from url, and saves it to a filename.
 #' For proper style, filename string should begin with "data/".
 #' Throws exception on failure.
-#' 
+#'
 #' @param url The URL of the file to download.
 #' @param filename The filename that the file is saved to.
 #'
@@ -27,14 +27,14 @@ fetch_file <- function(url, filename) {
 }
 
 #' Fetches the latest COVID-19 cases data from European Center for Disease Control (ECDC).
-#' 
+#'
 #' @returns None
-#' 
+#'
 fetch_latest_ecdc <- function() {
   url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
   filename <- "data/ecdc-COVID-19-up-to-date.csv"
   fetch_file(url, filename)
-  
+
   #' Quick cleanup on the column titles.
   #'
   d <- read.csv(filename, stringsAsFactors = FALSE)
@@ -50,16 +50,16 @@ fetch_latest_ecdc <- function() {
 #' Fetches latest data from John Hopkins University CSSE.
 #'
 #' @return None
-#' 
+#'
 fetch_latest_csse <- function() {
   url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
   filename <- "data/time_series_covid19_confirmed_global.csv"
   fetch_file(url, filename)
-  
+
   url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
   filename <- "data/time_series_covid19_deaths_global.csv"
   fetch_file(url, filename)
-  
+
   url <- "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv"
   filename <- "data/time_series_covid19_recovered_global.csv"
   fetch_file(url, filename)
@@ -67,14 +67,14 @@ fetch_latest_csse <- function() {
 
 
 #' Fetch Italian provinces data from DPC.
-#' 
+#'
 #' @return None
 #'
 fetch_latest_dpc <- function() {
   url <- "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv"
   filename <- "data/dpc-covid19-ita-province.csv"
   fetch_file(url, filename)
-  
+
   d <- read.csv(filename)
   #' Rename Italian column names
   names(d)[names(d) == "data"] <- "date"
@@ -99,7 +99,7 @@ getprovincelist <- function() {
   # cleanly. Because Sardinia is an island and the situation may be unique, we have just
   # excluded it from the analysis.
   sardiniaprefix <- "ITG2"
-  
+
   dsd <- get_eurostat_dsd("nama_10r_3gdp")
   itprovinces <- select(
     filter(
@@ -158,7 +158,7 @@ getdemodata <- function() {
   ), sex == "T" & age == "TOTAL")
   population <- select(population, c("geo", "values"))
   population$geo <- as.character(population$geo)
-  
+
   df <- rename(
     rename(
       gdppercapita %>%
@@ -182,7 +182,7 @@ getdemodata <- function() {
 augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, lat != 0)  # not regional data
   dpc <- filter(dpc, region != "Sardegna")
-  
+
   df <- left_join(dpc, demodata, by = c("province" = "name"))
   df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "population"))
   df
