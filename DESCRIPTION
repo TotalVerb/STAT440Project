@@ -13,6 +13,7 @@ Authors@R:
            role = c("aut", "cre"))
     person(given = "Ben",
            family = "Zhang",
+           email = "yxbzhang@gmail.com",
            role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 License: use_mit_license()
@@ -20,3 +21,5 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+Suggests: 
+    testthat
