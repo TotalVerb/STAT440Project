@@ -5,7 +5,7 @@ library(abind)
 
 #' Compile the stan model, run MCMC, and save results.
 #' @param cutoff The cutoff date (default: Mar 14).
-function runMCMC(cutoff = "2020-03-14") {
+runMCMC <- function(cutoff = "2020-03-14") {
   cf_mod <- stan_model("ClimateForcingModel.stan")
   save(cf_mod, file="data/cf_mod.rds")
 
