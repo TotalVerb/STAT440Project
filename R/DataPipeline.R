@@ -181,7 +181,7 @@ augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, region != "Sardegna")
 
   df <- left_join(dpc, demodata, by = c("province" = "name"))
-  df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "population"))
+  df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "new_cases", "population"))
   df
 }
 
@@ -207,7 +207,7 @@ importNOAAM <- memoise(importNOAA)
 
 #' Augment a single group of data points with weather, using a list of station codes.
 #' Query each station code for air temperature, dewpoint, and relative humidity, taking the closest result that is not NA.
-#' 
+#'
 #' @param group A dataframe groupby object on a particular province, which we are pulling weather data for.
 #' @param station A comma separated string of station codes, which are used by importNOAA to query for weather data from those stations.
 #'

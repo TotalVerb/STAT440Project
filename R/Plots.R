@@ -2,15 +2,6 @@ library(bayesplot)
 library(ggplot2)
 library(gtable)
 
-load("data/cf_fit.rds")
-
-descr = c("temp", "RH", "GDP per capita", "density")
-params <- rstan::extract(cf_fit)
-dates <-
-  c(paste("02-", 24:29, sep = ""),
-    paste("03-0", 1:9, sep = ""),
-    paste("03-", 10:13, sep = ""))
-
 #' Given the Bayesian posterior stanfit object, plot the MCMC confidence for
 #' beta.
 #'
@@ -18,13 +9,14 @@ dates <-
 #' @return A plot of location of standardized beta parameters, with 50%
 #'   confidence interval highlighted.
 plot_beta_confidence <- function(cf_fit) {
+  betadescr <- paste(descr, sep = ", ", collapse = ", ")
   (
     mcmc_areas(
       cf_fit,
       regex_pars = c("beta.+"),
       point_est = "mean"
     ) + ggplot2::labs(title = "Posterior of β, magnitude of climate forcings",
-                      subtitle = "Each standardized; in order: temp., rel. humidity, GDP p.c., density")
+                      subtitle = paste("Each standardized; in order:", betadescr)
   )
 }
 
@@ -148,6 +140,8 @@ plot_epsilon_dispersion <- function(params) {
                   subtitle = "Aggregated across all locations and times",
                   xlab = "difference in log(R)")
 }
+
+# TODO: move these to the Rmarkdown file
 
 plot_beta_confidence(cf_fit)
 plot_lambda_confidence(cf_fit, 1, 34)
