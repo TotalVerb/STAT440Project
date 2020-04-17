@@ -130,7 +130,7 @@ getprovincelist <- function() {
 #' @return Eurostat dataframe with columns "name", "gdppercapita", "density", "population".
 getdemodata <- function() {
   itprovinces <- getprovincelist()
-  
+
   #' Get GDP/capita data from Eurostat.
   #'
   gdppercapita <- filter(get_eurostat_data(
@@ -140,7 +140,7 @@ getdemodata <- function() {
   ), unit == "EUR_HAB")
   gdppercapita <- select(gdppercapita, c("geo", "values"))
   gdppercapita$geo <- as.character(gdppercapita$geo)
-  
+
   #' Get population density data from Eurostat.
   density <- get_eurostat_data(
     "demo_r_d3dens", # Specific column code for density from Eurostat documentation.
@@ -149,7 +149,7 @@ getdemodata <- function() {
   )
   density <- select(density, c("geo", "values"))
   density$geo <- as.character(density$geo)
-  
+
   #' Get population data from Eurostat.
   population <- filter(get_eurostat_data(
     "demo_r_pjangrp3", # Specific column code for population from Eurostat documentation.
@@ -174,10 +174,10 @@ getdemodata <- function() {
 }
 
 #' Augment Italy DPC data with demographics, and also removes Sardinia provinces
-#' 
+#'
 #' @param dpc Italian per province timeseries data.
 #' @param demodata Dataframe sourced from Eurostat that contains GDP per Capita and Density information on Italian regions.
-#' 
+#'
 #' @return Augmented dataframe that contains both COVID-19 cases timeseries and eurostats.
 augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, lat != 0)  # not regional data
@@ -189,13 +189,14 @@ augmentDPCdemo <- function(dpc, demodata) {
 }
 
 #' Get the closest weather stations to a latitude longitude point.
-#' 
+#'
 #' @param lat Latitude
 #' @param long Longitude
 #' @param n Number of weather stations to get.
-#' 
+#'
 #' @return The codes of the closest weather stations in a list format.
 closestweatherstations <- function(lat, long, n) {
+  print(paste("Querying for", lat, long))
   getMeta(lat = lat, lon = long, n = n)$code
 }
 
@@ -212,11 +213,15 @@ importNOAAM <- memoise(importNOAA)
 #' 
 #' @param group A dataframe groupby object on a particular province, which we are pulling weather data for.
 #' @param station A comma separated string of station codes, which are used by importNOAA to query for weather data from those stations.
-#' 
+#'
 #' @return Augmented dataframe groupby object which now contains "air_temp", "RH", "dewpoint" as columns.
 augmentsingleweather <- function(group, station) {
   fallbacks <- strsplit(station$station[1], ",")[[1]]
-  print(paste("Looking up weather for", fallbacks))
+  if (has_cache(importNOAAM)(code = fallbacks, year = 2020)) {
+    cat('.')
+  } else {
+    print(paste("Looking up weather for", paste(fallbacks, sep = ', ', collapse = ', ')))
+  }
   noaa <- importNOAAM(code = fallbacks, year = 2020)
   noaa <- noaa %>% group_by(date) %>% summarize(
     air_temp = first(na.omit(air_temp)), RH = first(na.omit(RH))
@@ -224,13 +229,16 @@ augmentsingleweather <- function(group, station) {
   left_join(group, noaa, by = "date")
 }
 
-#' Augment a table with date, lat, and long columns with weather data collected closest to the given time.
-#' For each province, locate the 5 closest weather stations and store their station codes used by NOAA.
-#' Then, query NOAA with augmentsingleweather for the air temperature, dewpoint, and relative humidity at that station.
-#' Warning: This function will be very slow, since it queries the NOAA database often.
+
+#' Augment a table with date, lat, and long columns with weather data collected
+#' closest to the given time. **Warning**: This function will be very slow,
+#' since it queries the NOAA database often. Also, it may hang indefinitely due
+#' to a presumed bug in the worldmet package. Multiple attempts may be
+#' necessary. Use the `robust` utility function to automate the re-running of
+#' this function.
 #'
 #' @param dpc Dataframe of DPC per province time series case data. Required columns: "date", "lat", "long".
-#' 
+#'
 #' @return Transformed dataframe with new columns added: "air_temp", "dewpoint", "RH".
 augmentDPCweather <- function(dpc) {
   # 1. Find the appropriate station code for each latitude and longitude present in data.
@@ -248,11 +256,36 @@ augmentDPCweather <- function(dpc) {
   group_by(dpc, station) %>% group_modify(augmentsingleweather) %>% ungroup
 }
 
+#' Convert single-argument function f to a robust version. The robust version of
+#' the function will be run over and over on the same input until successful.
+#' Each individual run is not allowed to take longer than 60s (or a different
+#' specified timeout).
+#' @param f The function to make robust (must accept one argument).
+#' @param timeout The number of seconds each individual run is allowed to use.
+#' @return A robust version of `f`.
+robust <- function(f, timeout = 60) {
+  # Code modified from https://stackoverflow.com/a/20770711/3575047 by Vincent
+  # Zoonekynd.
+  function(arg) {
+    attempt <- 1
+    result <- NULL
+    while (is.null(result) && attempt <= 1000) {
+      print(paste("Attempt", attempt))
+      attempt <- attempt + 1
+      try(
+        result <- withTimeout(f(arg), timeout = timeout)
+      )
+    }
+    result
+  }
+}
+
 #' Repair total case data to be monotonically increasing, through taking a rolling maximum.
-#' Also drop the last date as it is likely to have no weather data for each location.
-#' 
+#' Drop the last date as it is likely to have no weather data for each location.
+#' Add new_cases column which contains the number of new cases each day.
+#'
 #' @param dpc Dataframe of DPC per province timeseries. Requires the columns: "date", "province", "total_cases".
-#' 
+#'
 #' @return Transformed dataframe with modified "total_cases" column, where the column is now monotonically increasing.
 repairtotalcases <- function(dpc) {
   (dpc
@@ -264,14 +297,13 @@ repairtotalcases <- function(dpc) {
   )
 }
 
-
 #' Code which augments the Italian per province data with GDP, weather, density data.
-#' 
+#'
 demodata <- getdemodata()
 dpc <- read.csv("data/dpc-covid19-ita-province.csv")
 df <- repairtotalcases(dpc)
 df <- augmentDPCdemo(df, demodata)
-df <- augmentDPCweather(df)
+df <- robust(augmentDPCweather, timeout=120)(df)
 write.csv(demodata, "data/demodata.csv")
 write.csv(df, "data/dpc-augmented.csv")
 
