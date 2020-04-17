@@ -1,6 +1,6 @@
 ---
 title: "Inference of seasonal forcings on reproduction numbers during epidemics"
-author: "Lu Lu, Ziyao Tian, Fengyang Wang, Yi Xiao Zhang"
+author: "Fengyang Wang, Lu Lu, Ziyao Tian, Yi Xiao Zhang"
 output:
   pdf_document: default
   html_notebook: default
@@ -8,18 +8,20 @@ output:
 
 ## Abstract
 
-## Introduction
+Amidst the current COVID-19 epidemic, the prediction of its future spread and the length of the epidemic becomes increasingly significant. We investigate the effects of temperature and humidity on the reproductive rate R of COVID-19, as warmer climates in the summer have historically resulted in diminished spread of influenza. Early epidemiology research in COVID-19 have used simple linear models such as ordinary least squares regression to estimate the relationship between R and climate. We estimate the reproductive rate of the virus using a novel Bayesian inference model with MCMC sampling to daily case data of various climate regions. While results are largely inconclusive, they provide us with a weak posterior update that R decreases with temperature and relative humidity.
 
-[TK: this is retained from Proposal, modify]
+## Introduction
 
 Exponential growth of the number of symptomatic cases is usually observed in the initial stages of infectious disease epidemics. Typically, the rate of this growth is decomposed into two quantities:
 
-- The serial interval: time between onset of symptoms of two adjacent individuals in a transmission chain
-- The reproductive number, $R$: the expected number of new infections a single symptomatic individual will cause
+- The serial interval: time between onset of symptoms of two adjacent individuals in a transmission chain.
+- The reproductive number, $R$: the expected number of new infections a single symptomatic individual will cause.
 
-The estimation of the latter quantity is important for policy, because infectious disease outbreaks will switch from an exponential growth regime to an exponential decay regime when the reproductive number falls below 1. The goal of mitigation or suppression policies is therefore to effect change on the reproductive number $R$.
+Due to inadequate public data to compute the serial interval, we use the estimated serial interval of $4.7$ days with standard deviation $2.9$ days obtained from Nishiura et al. (2020) [1]. The estimation of the latter quantity is important for policy, because infectious disease outbreaks will switch from an exponential growth regime to an exponential decay regime when the reproductive number falls below 1. The goal of mitigation or suppression policies is therefore to effect change on the reproductive number R. Many infectious diseases are believed to be seasonal, including most respiratory viruses, like the SARS-CoV-2 virus implicated in the 2019–2020 coronavirus pandemic. Wang et al. (2020) [3] have analysed how the weather of locations within China correlates with local point estimates of the reproductive number R. However, because their analysis is frequentist in nature, their estimates of the seasonal forcing do not come with any estimate of uncertainty.
 
-Many infectious diseases are believed to be seasonal, including most respiratory viruses, like the SARS-CoV-2 virus implicated in the 2019–2020 coronavirus pandemic. Wang et al. (2020) have analysed how the weather of locations within China correlates with local point estimates of the reproductive number $R$. However, because their analysis is frequentist in nature, their estimates of the seasonal forcing do not come with any estimate of uncertainty.
+We first produce a baseline model, which predicts the reproductive rate using the EpiEstim package, based on previous work by Thompson et al. (2019) [2], and applied to COVID-19 data as in Abbot et al. (2020) [4]. We then apply ordinary least squares regression against climate variables as well as other underlying regional factors, such as population density, GDP per capita, and latitude, similar to the work produced by Wang et al. (2020)[3]. We compare this against our novel Bayesian framework, and evaluate the significance of the explanatory variables in each model.
+
+Since Italy was one of the first countries affected by the epidemic, it has a longer history of case data before intervention and lockdowns took place. Furthermore, due to the many provinces of Italy having diverse climates, we have access to a larger range of temperature and humidity. Therefore, we sourced the Italian government DPC dataset[5], which contains time series incidence for each province since mid February. Using the temperature and humidity data from weather stations sourced from NOAA, we are able to estimate the climate for over $80$ distinct provinces in the Italian COVID-19 dataset.
 
 ## Methodology
 
@@ -168,7 +170,7 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 ### Using OLS and EpiEstim to check results
 
-[TK: @Ben mention the OLS against EpiEstim ]
+The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020), which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Cori et al. (2013) [7] for estimating R from bayesian inference on serial interval and time series data, which can be easily implemented using the EpiEstim package.
 
 ### Dataset
 
@@ -190,8 +192,19 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 ## Appendix
 
-- (PRE-PRINT) Abbott, S., Hellewell, J., Munday, J. D., Chun, J. Y., Thompson, R. N., Bosse, N. I., Chan, Y. D., Russell, T. W., Jarvis, C. I., ... & Funk, S. (2020). Temporal variation in transmission during the COVID-19 outbreak. CMMID. Available at CMMID: [https://cmmid.github.io/topics/covid19/current-patterns-transmission/global-time-varying-transmission.html](https://cmmid.github.io/topics/covid19/current-patterns-transmission/global-time-varying-transmission.html)
 
-- Thompson, R. N., Stockwin, J. E., van Gaalen, R. D., Polonsky, J. A., Kamvar, Z. N., Demarsh, P. A., ... & Lessler, J. (2019). Improved inference of time-varying reproduction numbers during infectious disease outbreaks. Epidemics, 29, 100356.
+### References
 
-- Wang, J., Tang, K., Feng, K., & Lv, W. (2020). High Temperature and High Humidity Reduce the Transmission of COVID-19. Available at SSRN: [https://ssrn.com/abstract=3551767](https://ssrn.com/abstract=3551767) or [http://dx.doi.org/10.2139/ssrn.3551767](http://dx.doi.org/10.2139/ssrn.3551767)
+[1] Nishiura H, Linton NM, Akhmetzhanov AR. Serial interval of novel coronavirus (2019-nCoV) infections. medRxiv Published Online First: 2020. doi:10.1101/2020.02.03.20019497
+
+[2] R.N. Thompson, J.E. Stockwin, R.D. van Gaalen, J.A. Polonsky, Z.N. Kamvar, P.A. Demarsh, E. Dahlqwist, S. Li, E. Miguel, T. Jombart, J. Lessler, S. Cauchemez, A. Cori. Improved inference of time-varying reproduction numbers during infectious disease outbreaks, Epidemics, Volume 29, 2019, 100356, ISSN 1755-4365, https://doi.org/10.1016/j.epidem.2019.100356.
+
+[3] Wang, Jingyuan and Tang, Ke and Feng, Kai and Lv, Weifeng, High Temperature and High Humidity Reduce the Transmission of COVID-19 (March 9, 2020). http://dx.doi.org/10.2139/ssrn.3551767
+
+[4] (PREPRINT) Abbott, S., Hellewell, J., Munday, J. D., Chun, J. Y., Thompson, R. N., Bosse, N. I., Chan, Y. D., Russell, T. W., Jarvis, C. I., ... & Funk, S. (2020). Temporal variation in transmission during the COVID-19 outbreak. CMMID. Available at CMMID: https://cmmid.github.io/topics/covid19/current-patterns-transmission/global-time-varying-transmission.html
+
+[5] Presidenza del Consiglio dei Ministri - Dipartimento della Protezione Civile, Dati COVID-19 Italia, (2020), GitHub repository, https://github.com/pcm-dpc/COVID-19
+
+[6] “Report 13 - Estimating the Number of Infections and the Impact of Non-Pharmaceutical Interventions on COVID-19 in 11 European Countries.” Imperial College London, www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-13-europe-npi-impact/.
+
+[7] Anne Cori, Neil M. Ferguson, Christophe Fraser, Simon Cauchemez, A New Framework and Software to Estimate Time-Varying Reproduction Numbers During Epidemics, American Journal of Epidemiology, Volume 178, Issue 9, 1 November 2013, Pages 1505–1512, https://doi.org/10.1093/aje/kwt133
