@@ -40,7 +40,8 @@ plot_lambda_confidence <- function(cf_fit, start, end) {
       cf_fit,
       pars = paste("lambda[", start:end, "]", sep = ""),
       point_est = "mean"
-    ) + ggplot2::labs(
+    )
+    + ggplot2::labs(
       title = "Posterior of λ, location-dependent adjustment to log(R)",
       subtitle = paste(
         "Mean, 50% and 90% confidence intervals for locations",
@@ -49,8 +50,10 @@ plot_lambda_confidence <- function(cf_fit, start, end) {
         end
       ),
       x = "Local adjustment to log(R)"
-    ) + ggplot2::theme(axis.text.y = element_blank(),
-                       axis.ticks.y = element_blank())
+    )
+    + ggplot2::theme(axis.text.y = element_blank(),
+                     axis.ticks.y = element_blank())
+    + xlim(-2, 2)
   )
 }
 
@@ -152,6 +155,8 @@ plot_lambda_confidence(cf_fit, 35, 68)
 plot_lambda_confidence(cf_fit, 69, 102)
 plot_independentR(params, cf_data)
 plot_locationR(params, cf_data, 13, "Bergamo")
+plot_locationR(params, cf_data, 55, "Milano")
 plot_locationR(params, cf_data, 79, "Rome")
 plot_locationR(params, cf_data, 96, "Venezia")
+plot_locationR(params, cf_data, 99, "Verona")
 plot_epsilon_dispersion(params)
