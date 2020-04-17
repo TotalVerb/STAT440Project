@@ -181,7 +181,7 @@ augmentDPCdemo <- function(dpc, demodata) {
   dpc <- filter(dpc, region != "Sardegna")
 
   df <- left_join(dpc, demodata, by = c("province" = "name"))
-  df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "population"))
+  df <- select(df, c("date", "province", "lat", "long", "gdppercapita", "density", "total_cases", "new_cases", "population"))
   df
 }
 
@@ -207,7 +207,7 @@ importNOAAM <- memoise(importNOAA)
 
 #' Augment a single group of data points with weather, using a list of station codes.
 #' Query each station code for air temperature, dewpoint, and relative humidity, taking the closest result that is not NA.
-#' 
+#'
 #' @param group A dataframe groupby object on a particular province, which we are pulling weather data for.
 #' @param station A comma separated string of station codes, which are used by importNOAA to query for weather data from those stations.
 #'
@@ -278,7 +278,7 @@ robust <- function(f, timeout = 60) {
 }
 
 #' Repair total case data to be monotonically increasing, through taking a rolling maximum.
-#' Drop the last date as it is likely to have no weather data for each location.
+#' Drop the last 4 dates as it is likely to have no weather data for each location.
 #' Add new_cases column which contains the number of new cases each day.
 #'
 #' @param dpc Dataframe of DPC per province timeseries. Requires the columns: "date", "province", "total_cases".
@@ -290,6 +290,9 @@ transform_total_cases <- function(dpc) {
    %>% group_modify(~ arrange(.x, by=date) %>% mutate(total_cases = cummax(total_cases)))
    %>% mutate(new_cases = c(0, diff(total_cases)))
    %>% ungroup
+   %>% filter(date != max(as.character(date)))
+   %>% filter(date != max(as.character(date)))
+   %>% filter(date != max(as.character(date)))
    %>% filter(date != max(as.character(date)))
   )
 }
