@@ -1,9 +1,15 @@
 ---
 title: "Inference of seasonal forcings on reproduction numbers during epidemics"
 author: "Fengyang Wang, Lu Lu, Ziyao Tian, Yi Xiao Zhang"
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
 output:
   pdf_document: default
   html_notebook: default
+  rmarkdown::pdf_document:
+    fig_caption: yes        
+    includes:  
+      in_header: preamble.tex
 ---
 
 ## Abstract
@@ -178,12 +184,68 @@ The baseline model we build estimates the reproductive rate using a parametric S
 
 - The Italian government dataset at https://github.com/pcm-dpc/COVID-19 contains the disease incidence for each province. This data contains date of confirmation instead of date of onset of symptoms, and so some procedure may be necessary to correct for this. Abbott et al. (2020) outlines a technique to correct for reporting delays using an exponential distribution of reporting delay fit to line list data; we may use the same distribution.
 - The `worldmet` R package enables access to temperature and humidity data, sourced from NOAA.
+- 
 
 ## Results
+[What methods/models are best]
+[What condition(s) does each method/model work well/poorly]
+[Conclusion about dataset]
+
+Applying the methods depicted from the methodology section, we obtain the following results.
+
+\begin{center}
+\includegraphics[width=0.5\textwidth]{plots/plot1.png}
+\end{center}
+
+[TK: Beta values]
+Fitting our Bayesian model, which extends the method of Thompson et. al, values of beta were estimated for temperature, relative humidity, Gross Domestic Product (GDP) and population density, respectively.  Thus, our model estimates $\beta^T = [,,,,]$ in
+$$ R_i(t) = \exp\left( \theta(t) + \lambda_i + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)$$
+Note that each feature's data is standardized to mean 0 and variance 1. 
+
+The model indicates that higher temperatures are observed with lower $R_0$ values, and higher GDP is observed with higher $R_0$ values, while relative humidity and population density have $R_0$ close to zero.
+
+### Posterior of Lambda, location-dependent adjustment to log(R)
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot2.png}
+\includegraphics[width=.49\textwidth]{plots/plot3.png}
+\includegraphics[width=.49\textwidth]{plots/plot4.png}
+\end{center}
+
+- $\lambda$ is an adjustment to the model based on the location you're in. 
+### Climate-Independent Basic R, by Date
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot5.png}
+\end{center}
+- R_0 is high in early phases, with an early spike on February 27, potentially due to increased in testing, which captures cases before.
+- Climate-independent means ignores local climates, and produces an aggregate result.
+
+### Estimated R in Cities by Date
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot6.png}
+\includegraphics[width=.49\textwidth]{plots/plot7.png}
+\includegraphics[width=.49\textwidth]{plots/plot8.png}
+\includegraphics[width=.49\textwidth]{plots/plot9.png}
+\includegraphics[width=.49\textwidth]{plots/plot10.png}
+\end{center}
+
+- local, no longer climate independent.
+
+### Epsilon, Idiosyncratic adjustment to log(R)
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot11.png}
+\end{center}
+
+- You want to minimize the value episilon. 
 
 ## Discussion
 
 ### Directions for Future Research
+
+As COVID-19 is also an ongoing epidemic, more data surfaces and updates on a continuous basis. Future research directions consist of updating the dataset by extending the time range to include newer data and including additional countries and cities - such as by looking at the climate and infection data in American and Canadian cities. In particular, by looking at the results of other cities and making a comparison with the results in Italy, we can observe if the linear assumption between seasonal factors and R holds true across different climate regions. If not, we can try fitting while assuming a nonlinear relationship between R and seasonal factors. Additional future research includes looking into statistical simulation models which consider intercity travel and geographic proximity. Using the results from the simulation models, we can help further isolate the direct effects of temperature and humidity on the reproduction rate of COVID-19.
+
 
 [TK: retained from proposal, need to modify]
 
