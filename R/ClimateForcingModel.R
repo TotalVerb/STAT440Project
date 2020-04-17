@@ -27,14 +27,15 @@ df <- (
 )
 
 # Stop the analysis on Mar 13
-df <- filter(df, date <= "2020-03-13")
+df <- filter(df, date < "2020-03-14")
 
-# Standardize regressors.
-# TODO: Remember the original scale of the series so that the model coefficients
-# are interpretable.
+#' Standardize a single feature.
+#' @param series The series to standardize.
+#' @return A series with mean 0 and standard deviation 1.
 standardize <- function(series) {
   (series - mean(series)) / sd(series)
 }
+
 df <- (
   df
   %>% mutate(std_air_temp = standardize(air_temp),
