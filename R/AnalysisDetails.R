@@ -1,13 +1,3 @@
-#' Description of the seasonal forcing features used in the analysis.
-descr = c("temp", "RH", "GDP per capita", "density")
-
-#' Create labels for dates appropriate for use in a chart, by removing the year.
-#' @param range The date range.
-#' @return A vector of strings to use as labels for a chart.
-removeyear <- function(range) {
-  substr(toString(as.Date(range)), 5, 10)
-}
-
 #' Return a list containing results of the analysis, sufficient for generating plots.
 #' Must be called after `collectData()` and `runMCMC()` and `runThompson()`.
 #' @return The saved results of the analysis.
@@ -25,6 +15,7 @@ results <- function() {
   load("data/cf_dates.rds")
   load("data/thompson_fit.rds")
   list(
+    descr = c("temp", "RH", "GDP per capita", "density"),
     dpc = dpc,
     stanfit = cf_fit,
     standata = cf_data,
