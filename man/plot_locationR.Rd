@@ -5,12 +5,12 @@
 \title{Given the Bayesian posterior samples and initial data, return the modeled
 time-varying R for location with the given index.}
 \usage{
-plot_locationR(params, loc)
+plot_locationR(res, loc)
 }
 \arguments{
-\item{loc}{Index of the location to examine.}
-
 \item{res}{Samples of posterior distribution of parameters.}
+
+\item{loc}{Index of the location to examine.}
 }
 \value{
 A ggplot2 time series of estimated R with 80\% confidence.

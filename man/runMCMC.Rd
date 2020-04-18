@@ -7,21 +7,7 @@
 runMCMC(cutoff = "2020-03-14")
 }
 \arguments{
-\item{cutoff}{The cutoff date (default: Mar 14).
-Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
-CMMID paper https://epiforecasts.io/covid/methods.html}
-
-\item{n}{The number of discrete dates in the future to compute a serial
-interval density for.}
-
-\item{mean}{The estimated mean of the serial interval.}
-
-\item{sd}{The estimated standard distribution of the serial interval.}
-}
-\value{
-A vector whose index corresponds to the number of days in the future,
-and whose value corresponds to the density of the serial interval
-distribution.
+\item{cutoff}{The cutoff date (default: Mar 14).}
 }
 \description{
 Compile the stan model, run MCMC, and save results.

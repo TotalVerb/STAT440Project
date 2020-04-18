@@ -6,6 +6,16 @@
 \usage{
 closestweatherstationsM(lat, long, n)
 }
+\arguments{
+\item{lat}{Latitude}
+
+\item{long}{Longitude}
+
+\item{n}{Number of weather stations to get.}
+}
+\value{
+The codes of the closest weather stations in a list format.
+}
 \description{
 Memoized equivalent of functions, such that repeated function calls are efficient.
 }

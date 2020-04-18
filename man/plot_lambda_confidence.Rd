@@ -9,6 +9,10 @@ plot_lambda_confidence(res, start, end)
 }
 \arguments{
 \item{res}{Output of \code{results()} containing results of the analysis.}
+
+\item{start}{First location to display.}
+
+\item{last}{Last location to display.}
 }
 \value{
 A plot of location of standardized beta parameters, with 50\%

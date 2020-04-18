@@ -49,6 +49,8 @@ plot_beta_confidence <- function(res) {
 #' lambda
 #'
 #' @param res Output of `results()` containing results of the analysis.
+#' @param start First location to display.
+#' @param last Last location to display.
 #' @return A plot of location of standardized beta parameters, with 50%
 #'   confidence interval highlighted.
 plot_lambda_confidence <- function(res, start, end) {
@@ -107,7 +109,7 @@ plot_independentR <- function(res) {
 #' @param res Samples of posterior distribution of parameters.
 #' @param loc Index of the location to examine.
 #' @return A ggplot2 time series of estimated R with 80% confidence.
-plot_locationR <- function(params, loc) {
+plot_locationR <- function(res, loc) {
   thetadf <- data.frame(res$params$theta +
                           res$params$lambda[loc] +
                           res$params$epsilon[, loc, ] +
