@@ -1,7 +1,16 @@
-#' @importFrom stats density dnorm filter lm na.omit quantile
+#' @importFrom stats density dnorm lm na.omit quantile
 #' @importFrom utils download.file read.csv write.csv
 #' @importFrom dplyr %>% coalesce filter first full_join group_by group_map
-#'   group_modify left_join mutate rename ungroup
+#'   group_modify left_join mutate rename select summarize ungroup
+#' @importFrom memoise has_cache
+#' @importFrom rstan sampling
+#' @importFrom abind abind
+#' @importFrom bayesplot mcmc_areas mcmc_intervals
+#' @importFrom ggplot2 element_blank element_text geom_histogram geom_smooth ggplot xlim ylab
+#' @importFrom worldmet getMeta
+#' @importFrom restatapi get_eurostat_data get_eurostat_dsd
+#' @importFrom EpiEstim estimate_R
+#' @importFrom R.utils withTimeout
 NULL
 
 #' dpc-covid19-ita-province

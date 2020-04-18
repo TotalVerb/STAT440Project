@@ -28,7 +28,7 @@ getSIdist <- function(n, mean = 4.7, sd = 2.9) {
 #' @param cutoff The cutoff date (default: Mar 14).
 #' @export
 runMCMC <- function(cutoff = "2020-03-14") {
-  df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
+  df <- read.csv("inst/extdata/dpc-augmented.csv", stringsAsFactors = FALSE)
 
   # Stop the analysis on Mar 13
   df <- filter(df, date < cutoff)

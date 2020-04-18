@@ -11,23 +11,6 @@ runThompson(filename = "inst/extdata/dpc-augmented.csv")
 }
 \value{
 Fit object, result of linear regression on log(R) against standardized confounding variables.
-Prepare an empty dataframe to collect each province's daily R estimates.
-Standardize each of the variables.
-Compute the reproductive rate estimates for each province in our dataset.
-
-Analysis Step 1: Estimate the serial interval
-
-We have determined that it is difficult to find the line-list data for COVID-19, and thus will be using
-the mean and standard deviation used by Abbott et al (2020).
-Analysis Step 2: Estimate the reproduction rate.
-
-res_parametric_si dataframe R that is based on aggregating on a weekly sliding window.
-Therefore, the length of the date list and the mean list is off by 7.
-Analysis Step 3: Linear Regression Against Climate (and other confounding variables).
-
-Cutoff on 2020-03-13, since intervention completely changes regime.
-Take logarithm of mean_R.
-Perform linear regression on expected R against: GDP per capita, Density, Air Temperature, Relative Humidity.
 }
 \description{
 Follows the framework of the Thompson et al. (2019) paper, while using OLS to predict R from climate similar to Wang et al.
