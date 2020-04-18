@@ -48,4 +48,5 @@ NULL
 # dplyr "globals" and cf_data, cf_fit which come from `load`, throw.error from R.oo
 utils::globalVariables(c("RH", "adjustment", "age", "air_temp", "cf_data", "cf_fit", "code", "concept",
                          "dates", "fit", "gdppercapita", "lat", "logR", "province", "region", "sex",
-                         "theme", "throw.error", "total_cases", "unit", "values", "values.x", "values.y"))
+                         "station", "theme", "throw.error", "total_cases", "unit", "values", "values.x",
+                         "values.y"))
