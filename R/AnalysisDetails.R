@@ -3,11 +3,6 @@
 #' @return The saved results of the analysis.
 #' @export
 results <- function() {
-  if (!file.exists("inst/extdata/dpc-augmented.csv")) {
-    throw.error("Could not find augmented DPC data. Did you `collectData()`?")
-  } else if (!file.exists("inst/extdata/cf_fit.rds") | !file.exists("inst/extdata/cf_data.rds") | !file.exists("inst/extdata/cf_dates.rds")) {
-    throw.error("Could not find MCMC fit results. Did you `runMCMC()`?")
-  }
   dpc <- read.csv("inst/extdata/dpc-augmented.csv")
   load("inst/extdata/cf_fit.rds")
   load("inst/extdata/cf_data.rds")
