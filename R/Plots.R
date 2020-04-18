@@ -50,7 +50,7 @@ plot_beta_confidence <- function(res) {
 #'
 #' @param res Output of `results()` containing results of the analysis.
 #' @param start First location to display.
-#' @param last Last location to display.
+#' @param end Last location to display.
 #' @return A plot of location of standardized beta parameters, with 50%
 #'   confidence interval highlighted.
 plot_lambda_confidence <- function(res, start, end) {

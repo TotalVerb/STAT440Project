@@ -292,7 +292,7 @@ transform_total_cases <- function(dpc) {
 }
 
 #' Augments the Italian per province data with GDP, weather, density data.
-#' Produces a file data/dpc-augmented.csv which contains the required data for
+#' Produces a file inst/extdata/dpc-augmented.csv which contains the required data for
 #' this analysis.
 #' @param rewriteall Attempt to refresh all files even if already exist. If
 #'   TRUE, this function may need to be called multiple times due to `worldmet`
@@ -300,13 +300,13 @@ transform_total_cases <- function(dpc) {
 collectData <- function(rewriteall = FALSE) {
   fetch_latest_csse()
 
-  if (rewriteall | !file.exists("data/dpc-augmented.csv")) {
+  if (rewriteall | !file.exists("inst/extdata/dpc-augmented.csv")) {
     demodata <- getdemodata()
     dpc <- fetch_latest_dpc()
     df <- transform_total_cases(dpc)
     df <- augmentDPCdemo(df, demodata)
     df <- robust(augmentDPCweather, timeout=120)(df)
-    write.csv(df, "data/dpc-augmented.csv")
+    write.csv(df, "inst/extdata/dpc-augmented.csv")
 
     # test: check that no provinces weren't mapped to demographic data
     stopifnot(nrow(filter(df, is.na(density))) == 0)

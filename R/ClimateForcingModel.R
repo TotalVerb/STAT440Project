@@ -68,9 +68,9 @@ runMCMC <- function(cutoff = "2020-03-14") {
   cf_fit <- sampling(cf_mod, data = cf_data, verbose = TRUE)
 
   dates <- unique(df$date)
-  save(dates, file="data/cf_dates.rds")
-  save(cf_fit, file="data/cf_fit.rds")
-  save(cf_data, file="data/cf_data.rds")
+  save(dates, file="inst/extdata/cf_dates.rds")
+  save(cf_fit, file="inst/extdata/cf_fit.rds")
+  save(cf_data, file="inst/extdata/cf_data.rds")
 
   print("Execution completed. Read a summary object of results using `results()`.")
 }

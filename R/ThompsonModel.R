@@ -10,7 +10,7 @@ library(dplyr)
 #'
 #' @param filename The path to the augmented data file which we will be using.
 #' @return Fit object, result of linear regression on log(R) against standardized confounding variables.
-runThompson <- function(filename = "data/dpc-augmented.csv") {
+runThompson <- function(filename = "inst/extdata/dpc-augmented.csv") {
   dpc_df <- read.csv(filename)
   dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")
   province_names <- unique(dpc_df$province)
@@ -66,7 +66,7 @@ runThompson <- function(filename = "data/dpc-augmented.csv") {
 
   #' Perform linear regression on expected R against: GDP per capita, Density, Air Temperature, Relative Humidity.
   fit <- lm(mean_R ~ gdppercapita + density + air_temp + RH, data=all_provinces_df)
-  save(fit, file="data/thompson_fit.rds")
+  save(fit, file="inst/extdata/thompson_fit.rds")
   fit
 }
 
