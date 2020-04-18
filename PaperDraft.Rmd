@@ -250,6 +250,32 @@ values are indeed consistent with the data. However, we will discuss in the
 interpretation section the limits of our approach, and why we believe this may
 not match the ground truth.
 
+### Interpretation
+
+While the overall results are not surprising, some caution is important in the
+interpretation of these results. There are at least three sources of uncertainty
+not captured in the analysis:
+
+- Uncertainty about the serial interval distribution (our method assumes the
+  serial interval distribution is known)
+- Uncertainty about timeliness of data (our model assumes cases are reported on
+  the date of infection; in reality there is a significant delay, which the model
+  does not attempt to adjust for)
+- Uncertainty of the completeness of the data (our method assumes all cases are
+  reported, which may not be true, as the high spikes in estimated $R$ are
+  unlikely to be ground truth; a more likely explanation is that early cases went
+  undetected for a long time)
+- Uncertainty about the accuracy and currency of data (our model assumes that
+  temperature, relative humidity, GDP per capita, and population data are local
+  and current, but in reality the demographic data is from 2017 and the weather
+  data is measured by the closest station that may be in some cases not even
+  located in the province)
+
+Hence, it is likely that the uncertainty in posterior estimations of $\beta$ by
+the model is understated. While the model provides some evidence that
+temperature is effective at reducing spread, we do not believe this evidence to
+be as strong as claimed.
+
 ## Discussion
 
 
