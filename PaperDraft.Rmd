@@ -178,7 +178,7 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating R from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
-For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. Thus, for each province, we produce a daily time series estimate for $R$ on each day. This method is outlined in detail in Wallinga and Teunis (2004)[8].
+For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ based on the SI parameters. From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. Thus, for each province, we produce a daily time series estimate for $R$ on each day. This method is outlined in detail in Wallinga and Teunis (2004)[8].
 
 For each province, day pair, we have $\bar{x} = (x_1, x_2, x_3, x_4), y$ where:
 
@@ -207,7 +207,7 @@ Fitting our Bayesian model, which extends the method of Thompson et. al, values
 of beta were estimated for temperature, relative humidity, Gross Domestic
 Product (GDP) and population density, respectively. The mean estimate of $\beta^T$ is
 
-$$ \beta^T = [-0.23198507 -0.05391226  0.26336295 -0.03586852] $$
+$$ \beta^T = [-0.23198507, -0.05391226, 0.26336295, -0.03586852] $$
 
 in the overall model for $R$:
 
@@ -291,7 +291,6 @@ be as strong as claimed.
 ### Directions for Future Research
 
 
-With our `cfc19i` library, it is
 
 Looking at the climate and infection data in American and Canadian cities as the situation develops further. In particular, compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, try fitting while assuming a nonlinear relationship between $R$ and seasonal factors.
 
