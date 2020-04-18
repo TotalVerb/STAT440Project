@@ -178,11 +178,8 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating R from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
-For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing
+For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. This method is outlined in detail in Wallinga and Teunis (2004)[8].
 
-$$
-p_{ij} = \frac{w(t_i - t_j)}{\sum_{i \neq k} }
-$$
 ## Results
 [What methods/models are best]
 [What condition(s) does each method/model work well/poorly]
@@ -194,31 +191,23 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \includegraphics[width=0.5\textwidth]{plots/plot1.png}
 \end{center}
 
-[TK: Beta values]
+[TK: Beta Values]
 Fitting our Bayesian model, which extends the method of Thompson et. al, values of beta were estimated for temperature, relative humidity, Gross Domestic Product (GDP) and population density, respectively.  Thus, our model estimates $\beta^T = [,,,,]$ in
 $$ R_i(t) = \exp\left( \theta(t) + \lambda_i + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)$$
 Note that each feature's data is standardized to mean 0 and variance 1.
 
 The model indicates that higher temperatures are observed with lower $R_0$ values, and higher GDP is observed with higher $R_0$ values, while relative humidity and population density have $R_0$ close to zero.
 
-### Posterior of Lambda, location-dependent adjustment to log(R)
 
-\begin{center}
-\includegraphics[width=.49\textwidth]{plots/plot2.png}
-\includegraphics[width=.49\textwidth]{plots/plot3.png}
-\includegraphics[width=.49\textwidth]{plots/plot4.png}
-\end{center}
-
-- $\lambda$ is an adjustment to the model based on the location you're in.
 ### Climate-Independent Basic R, by Date
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot5.png}
 \end{center}
-- R_0 is high in early phases, with an early spike on February 27, potentially due to increased in testing, which captures cases before.
-- Climate-independent means ignores local climates, and produces an aggregate result.
 
-### Estimated R in Cities by Date
+First, we observe that our computed value of $R_0$ in Italy matches what We observe that R_0 spikes in , with an early spike on February 27, potentially due to increased in testing, which captures cases before.
+
+### Estimated R in Various Provinces
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot6.png}
@@ -228,14 +217,7 @@ The model indicates that higher temperatures are observed with lower $R_0$ value
 \includegraphics[width=.49\textwidth]{plots/plot10.png}
 \end{center}
 
-- local, no longer climate independent.
-
-### Epsilon, Idiosyncratic adjustment to log(R)
-\begin{center}
-\includegraphics[width=.49\textwidth]{plots/plot11.png}
-\end{center}
-
-- You want to minimize the value episilon.
+Observe that in many cities, our estimated $R_0$ values are extremely high 
 
 ## Discussion
 
@@ -251,6 +233,18 @@ Look into statistical simulation models which consider intercity travel and geog
 
 ## Appendix
 
+### Posterior of Lambda, location-dependent adjustment to log(R)
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot2.png}
+\includegraphics[width=.49\textwidth]{plots/plot3.png}
+\includegraphics[width=.49\textwidth]{plots/plot4.png}
+\end{center}
+
+### Epsilon, Idiosyncratic adjustment to log(R)
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot11.png}
+\end{center}
 
 ### References
 
