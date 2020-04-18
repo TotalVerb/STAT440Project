@@ -12,7 +12,7 @@ plot_lambda_confidence(res, start, end)
 
 \item{start}{First location to display.}
 
-\item{last}{Last location to display.}
+\item{end}{Last location to display.}
 }
 \value{
 A plot of location of standardized beta parameters, with 50\%

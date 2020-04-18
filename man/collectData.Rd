@@ -3,7 +3,7 @@
 \name{collectData}
 \alias{collectData}
 \title{Augments the Italian per province data with GDP, weather, density data.
-Produces a file data/dpc-augmented.csv which contains the required data for
+Produces a file inst/extdata/dpc-augmented.csv which contains the required data for
 this analysis.}
 \usage{
 collectData(rewriteall = FALSE)
@@ -15,6 +15,6 @@ issues.}
 }
 \description{
 Augments the Italian per province data with GDP, weather, density data.
-Produces a file data/dpc-augmented.csv which contains the required data for
+Produces a file inst/extdata/dpc-augmented.csv which contains the required data for
 this analysis.
 }

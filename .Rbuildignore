@@ -7,3 +7,5 @@
 ^ProjectProposal.Rmd$
 ^ProjectProposal.nb.html$
 ^ProjectProposal.pdf$
+^plots$
+^preamble.tex$
