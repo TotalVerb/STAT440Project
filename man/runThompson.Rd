@@ -4,7 +4,7 @@
 \alias{runThompson}
 \title{Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.}
 \usage{
-runThompson(filename = "data/dpc-augmented.csv")
+runThompson(filename = "inst/extdata/dpc-augmented.csv")
 }
 \arguments{
 \item{filename}{The path to the augmented data file which we will be using.}
