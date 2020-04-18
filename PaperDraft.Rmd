@@ -131,7 +131,7 @@ circumstances at the given time; such as national policies or human behavioral
 changes. This will encapsulate various unmodeled behaviours such as weekends or
 interventions. At time zero, our prior belief is that this $R$ will match the
 consensus of international estimates for $R_0$, which vary widely but tend to
-cluster between $2$ or $3$ [TK: Citation needed?]. Because of the great
+cluster between $2$ or $3$. Because of the great
 uncertainty, there is significant variance in this assumption, so the prior is
 quite weak (note that the $\mu \pm 2\sigma$ values, when transformed
 exponentially, are below $1$ and above $6$ respectively).
@@ -336,30 +336,35 @@ The posterior estimates of our model suggest that there is some weak evidence th
 For future research, we would like to look into the climate and infection data in different countries as the situation develops further. In particular, we would like to compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, we would like to try fitting a nonlinear relationship between $R$ and seasonal factors.
 
 We would also like to look into statistical simulation models which consider intercity travel and geographic proximity. As our estimated $R$ is dependent on the serial interval number, it would also be worthwhile to see the sensitivity of our model with different values of serial interval number as did Flaxman et al. (2020)[6]. 
+
 \newpage
+
 # Appendix
 
 ## Posterior of $\lambda$, location-dependent adjustment to $log(R)$
 
 \begin{figure}
+\centering
 \includegraphics[width=.49\textwidth]{plots/plot2.png}
 \includegraphics[width=.49\textwidth]{plots/plot3.png}
 \includegraphics[width=.49\textwidth]{plots/plot4.png}
+\caption{Posterior location of $\lambda$, split into three plots for each
+location. $\lambda$ is an adjustment to the model based on the location.}
 \end{figure}
 
-$\lambda$ is an adjustment to the model based on the location. What we observe
-from the distribution of $\lambda$ is that some locations have much more
-certainty in how they deviate from the mean than others. This can be explained
-by the unequal distribution of cases across provinces; provinces with more cases
-lend themselves to more accurate estimation of $R$.
+What we observe from the distribution of $\lambda$ is that some locations have
+much more certainty in how they deviate from the mean than others. This can be
+explained by the unequal distribution of cases across provinces; provinces with
+more cases lend themselves to more accurate estimation of $R$.
 
 ## Epsilon, idiosyncratic adjustment to log(R)
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=.49\textwidth]{plots/plot11.png}
-\end{center}
+\caption{Histogram of all samples of all entires in the $\varepsilon$ matrix.}
+\end{figure}
 
-This histogram shows all samples of all entries in the $\varepsilon$ matrix.
 Generally, we prefer a lower average spread of $\varepsilon$, because it means
 that more of the variation in reproduction number can be predicted from the
 seasonal factors, location, and time alone. Unfortunately, we found the observed
