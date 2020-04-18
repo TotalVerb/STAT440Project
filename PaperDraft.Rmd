@@ -231,12 +231,6 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \includegraphics[width=0.5\textwidth]{plots/plot1.png}
 \end{center}
 
-```{r include=FALSE}
-require(cfc19i)
-
-res <- results()
-```
-
 Fitting our Bayesian model, which extends the method of Thompson et. al, values
 of beta were estimated for temperature, relative humidity, Gross Domestic
 Product (GDP) and population density, respectively. The mean estimate of $\beta^T$ is
