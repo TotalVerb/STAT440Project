@@ -7,14 +7,11 @@ results <- function() {
     throw.error("Could not find augmented DPC data. Did you `collectData()`?")
   } else if (!file.exists("inst/extdata/cf_fit.rds") | !file.exists("inst/extdata/cf_data.rds") | !file.exists("inst/extdata/cf_dates.rds")) {
     throw.error("Could not find MCMC fit results. Did you `runMCMC()`?")
-  } else if (!file.exists("inst/extdata/thompson_fit.rds")) {
-    throw.error("Could not find Thompson fit results. Did you `runThompson()`?")
   }
   dpc <- read.csv("inst/extdata/dpc-augmented.csv")
   load("inst/extdata/cf_fit.rds")
   load("inst/extdata/cf_data.rds")
   load("inst/extdata/cf_dates.rds")
-  load("inst/extdata/thompson_fit.rds")
   list(
     descr = c("temp", "RH", "GDP per capita", "density"),
     dpc = dpc,
@@ -22,7 +19,6 @@ results <- function() {
     standata = cf_data,
     params = rstan::extract(cf_fit),
     dates = dates,
-    locations = colnames(cf_data$i),
-    thompsonfit = fit
+    locations = colnames(cf_data$i)
   )
 }

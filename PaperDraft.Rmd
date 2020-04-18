@@ -133,7 +133,7 @@ circumstances at the given time; such as national policies or human behavioral
 changes. This will encapsulate various unmodeled behaviours such as weekends or
 interventions. At time zero, our prior belief is that this $R$ will match the
 consensus of international estimates for $R_0$, which vary widely but tend to
-cluster between $2$ or $3$ [TK: Citation needed?]. Because of the great
+cluster between $2$ or $3$. Because of the great
 uncertainty, there is significant variance in this assumption, so the prior is
 quite weak (note that the $\mu \pm 2\sigma$ values, when transformed
 exponentially, are below $1$ and above $6$ respectively).
@@ -232,6 +232,9 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \end{center}
 
 ```{r include=FALSE}
+require(cfc19i)
+
+res <- results()
 ```
 
 Fitting our Bayesian model, which extends the method of Thompson et. al, values
