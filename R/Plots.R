@@ -40,7 +40,7 @@ plot_beta_confidence <- function(res) {
       res$stanfit,
       regex_pars = c("beta.+"),
       point_est = "mean"
-    ) + ggplot2::labs(title = "Posterior of β, magnitude of climate forcings",
+    ) + ggplot2::labs(title = "Posterior of \u03B2, magnitude of climate forcings",
                       subtitle = paste("Each standardized; in order:", betadescr))
   )
 }
@@ -61,7 +61,7 @@ plot_lambda_confidence <- function(res, start, end) {
       point_est = "mean"
     )
     + ggplot2::labs(
-      title = "Posterior of λ, location-dependent adjustment to log(R)",
+      title = "Posterior of \u03bb, location-dependent adjustment to log(R)",
       subtitle = paste(
         "Mean, 50% and 90% confidence intervals for locations",
         start,
@@ -142,7 +142,7 @@ plot_epsilon_dispersion <- function(res) {
   df <- data.frame(adjustment = as.vector(res$epsilon))
   ggplot(df, aes(adjustment)) +
     geom_histogram() +
-    ggplot2::labs(title = "ε, idiosyncratic adjustment to log(R)",
+    ggplot2::labs(title = "\u03B5, idiosyncratic adjustment to log(R)",
                   subtitle = "Aggregated across all locations and times",
                   xlab = "difference in log(R)")
 }
