@@ -178,9 +178,8 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating $R$ from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
-<<<<<<< HEAD
 For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte $R$ at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. Thus, for each province, we produce a daily time series estimate for $R$ on each day. This method is outlined in detail in Wallinga and Teunis (2004)[8].
-=======
+
 For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ based on the SI parameters. From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. Thus, for each province, we produce a daily time series estimate for $R$ on each day. This method is outlined in detail in Wallinga and Teunis (2004)[8].
 
 
@@ -233,8 +232,6 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \end{center}
 
 ```{r include=FALSE}
-# res <- results()
-# plot_beta_confidence(res)
 ```
 
 Fitting our Bayesian model, which extends the method of Thompson et. al, values
@@ -264,6 +261,8 @@ for temperature, relative humidity, Gross Domestic Product (GDP) and population 
 $$
 R_i(t) = \exp\left(\beta_0 + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)
 $$
+
+We note that the coefficient for GDP per capita has flipped signs from the Bayesian framework estimate, with the other coefficient remaining the same sign. The p-values for GDP per capita and density are 0.00042 and 0.019 respectively, which are both significant. However, the p-values for air temperature and relative humidity are 0.42 and 0.65 respectively, which are much less significant. The large discrepancy in values between coefficients between the two models is surprising, considering they are both based on a linear relationship between $\log(R)$ and the confounding varaibles. Further investigation would be required in the future to determine the cause.
 
 ### Estimates of $\theta$, transformed to climate-independent $R$ by date
 
@@ -333,7 +332,7 @@ be as strong as claimed.
 
 The posterior estimates of our model suggest that there is some weak evidence that with increasing temperature, the reproductive number $R$ decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have. Our model does a good job estimating the reproductive number $R$ in various provinces with high confidence level and provides valuable information for policy makers. However, with no access to line-list data to estimate the serial interval number ourselves, our estimated reproductive number $R$ is limited by the accuracy of the serial interval number we used. The estimated $R$ values tend to have wide confidence interval in the beginning dates due to the imported cases in the beginning and the lack of testing. 
 
-For furure research, we would like to look into the climate and infection data in different countries as the situation develops further. In particular, we would like to compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, we would like to try fitting a nonlinear relationship between $R$ and seasonal factors.
+For future research, we would like to look into the climate and infection data in different countries as the situation develops further. In particular, we would like to compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, we would like to try fitting a nonlinear relationship between $R$ and seasonal factors.
 
 We would also like to look into statistical simulation models which consider intercity travel and geographic proximity. As our estimated $R$ is dependent on the serial interval number, it would also be worthwhile to see the sensitivity of our model with different values of serial interval number as did Flaxman et al. (2020)[6]. 
 
