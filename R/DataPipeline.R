@@ -199,10 +199,25 @@ closestweatherstations <- function(lat, long, n) {
 
 #' Memoized equivalent of functions, such that repeated function calls are efficient.
 #'
+#' @param lat Latitude
+#' @param long Longitude
+#' @param n Number of weather stations to get.
+#'
+#' @return The codes of the closest weather stations in a list format.
 closestweatherstationsM <- memoise(closestweatherstations)
 
 #' ImportNOAA is a function exposed in "worldmet" library. Gets data from weather stations.
 #'
+#' @param code Station codes to get data from.
+#' @param year Years to get data for.
+#' @param hourly If TRUE, aggregate hourly.
+#' @param precip If TRUE, include precipitation.
+#' @param PWC If TRUE, include text description.
+#' @param parallel If TRUE, use multiple cores.
+#' @param quiet If TRUE, do not produce output.
+#' @param path If provided, store results in a file.
+#'
+#' @return The codes of the closest weather stations in a list format.
 importNOAAM <- memoise(importNOAA)
 
 #' Augment a single group of data points with weather, using a list of station codes.

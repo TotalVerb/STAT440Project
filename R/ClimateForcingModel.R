@@ -3,18 +3,35 @@ library(dplyr)
 library(tidyr)
 library(abind)
 
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+#' Compiled STAN model of the seasonal forcing model described in accompanying
+#' report.
+cf_mod <- stan_model("ClimateForcingModel.stan")
+
+#' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
+#' CMMID paper https://epiforecasts.io/covid/methods.html
+#' @param n The number of discrete dates in the future to compute a serial
+#'   interval density for.
+#' @param mean The estimated mean of the serial interval.
+#' @param sd The estimated standard distribution of the serial interval.
+#' @return A vector whose index corresponds to the number of days in the future,
+#'   and whose value corresponds to the density of the serial interval
+#'   distribution.
+getSIdist <- function(n, mean = 4.7, sd = 2.9) {
+  w <- dnorm(1:n, mean, sd)
+  w / sum(w)
+}
+
 #' Compile the stan model, run MCMC, and save results.
 #' @param cutoff The cutoff date (default: Mar 14).
 runMCMC <- function(cutoff = "2020-03-14") {
-  cf_mod <- stan_model("ClimateForcingModel.stan")
-  options(mc.cores = parallel::detectCores())
-  rstan_options(auto_write = TRUE)
-
   df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
 
   # Stop the analysis on Mar 13
   df <- filter(df, date < cutoff)
-  
+
   # Standardize each of the columns we will use.
   df <- (
     df
@@ -34,19 +51,6 @@ runMCMC <- function(cutoff = "2020-03-14") {
 
   pop <- abind(df %>% group_by(province) %>% group_map(~ .x$population[1]), along=1)
 
-  #' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
-  #' CMMID paper https://epiforecasts.io/covid/methods.html
-  #' @param n The number of discrete dates in the future to compute a serial
-  #'   interval density for.
-  #' @param mean The estimated mean of the serial interval.
-  #' @param sd The estimated standard distribution of the serial interval.
-  #' @return A vector whose index corresponds to the number of days in the future,
-  #'   and whose value corresponds to the density of the serial interval
-  #'   distribution.
-  getSIdist <- function(n, mean = 4.7, sd = 2.9) {
-    w <- dnorm(1:n, mean, sd)
-    w / sum(w)
-  }
   w <- getSIdist(nrow(I))
 
   # stan data

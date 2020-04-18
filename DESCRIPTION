@@ -16,7 +16,7 @@ Authors@R:
            email = "yxbzhang@gmail.com",
            role = c("aut", "cre"))
 Description: Contains software for modeling climate forcings on the early stages of the COVID-19 outbreak in Italy.
-License: use_mit_license()
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
