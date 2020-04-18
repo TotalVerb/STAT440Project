@@ -1,17 +1,7 @@
-#' demodata
-#'
-#' Demographic data from Eurostat, including GDP per capita, population, and
-#' population density.
-#' @docType data
-#' @name demodata
-NULL
-
-#' dpc-augmented
-#'
-#' Processed data including weather, demographics, and also the DPC Italy
-#' disease incidence data.
-#' @docType data
-#' @name dpc-augmented
+#' @importFrom stats density dnorm filter lm na.omit quantile
+#' @importFrom utils download.file read.csv write.csv
+#' @importFrom dplyr %>% coalesce filter first full_join group_by group_map
+#'   group_modify left_join mutate rename ungroup
 NULL
 
 #' dpc-covid19-ita-province
@@ -19,14 +9,6 @@ NULL
 #' Raw data per Italian province published by the Italy DPC.
 #' @docType data
 #' @name dpc-covid19-ita-province
-NULL
-
-#' ecdc-COVID-19-up-to-date
-#'
-#' Raw data for various countries published by the ECDC. Not used in the
-#' analysis by default.
-#' @docType data
-#' @name ecdc-COVID-19-up-to-date
 NULL
 
 #' time_series_covid19_confirmed_global

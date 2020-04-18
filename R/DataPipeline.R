@@ -297,6 +297,7 @@ transform_total_cases <- function(dpc) {
 #' @param rewriteall Attempt to refresh all files even if already exist. If
 #'   TRUE, this function may need to be called multiple times due to `worldmet`
 #'   issues.
+#' @export
 collectData <- function(rewriteall = FALSE) {
   fetch_latest_csse()
 

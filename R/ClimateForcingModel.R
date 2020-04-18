@@ -26,6 +26,7 @@ getSIdist <- function(n, mean = 4.7, sd = 2.9) {
 
 #' Compile the stan model, run MCMC, and save results.
 #' @param cutoff The cutoff date (default: Mar 14).
+#' @export
 runMCMC <- function(cutoff = "2020-03-14") {
   df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
 

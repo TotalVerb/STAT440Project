@@ -1,6 +1,7 @@
 #' Return a list containing results of the analysis, sufficient for generating plots.
 #' Must be called after `collectData()` and `runMCMC()` and `runThompson()`.
 #' @return The saved results of the analysis.
+#' @export
 results <- function() {
   if (!file.exists("inst/extdata/dpc-augmented.csv")) {
     throw.error("Could not find augmented DPC data. Did you `collectData()`?")
@@ -25,4 +26,3 @@ results <- function() {
     thompsonfit = fit
   )
 }
-

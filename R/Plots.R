@@ -33,6 +33,7 @@ removeyear <- function(range) {
 #' @param res Output of `results()` containing results of the analysis.
 #' @return A plot of location of standardized beta parameters, with 50%
 #'   confidence interval highlighted.
+#' @export
 plot_beta_confidence <- function(res) {
   betadescr <- paste(res$descr, sep = ", ", collapse = ", ")
   (
@@ -53,6 +54,7 @@ plot_beta_confidence <- function(res) {
 #' @param end Last location to display.
 #' @return A plot of location of standardized beta parameters, with 50%
 #'   confidence interval highlighted.
+#' @export
 plot_lambda_confidence <- function(res, start, end) {
   (
     mcmc_intervals(
@@ -81,6 +83,7 @@ plot_lambda_confidence <- function(res, start, end) {
 #'
 #' @param res Samples of posterior distribution of parameters.
 #' @return A ggplot2 time series of estimated independent R with 80% confidence.
+#' @export
 plot_independentR <- function(res) {
   thetadf <- data.frame(res$params$theta)
   colnames(thetadf) <- removeyear(res$dates)
@@ -109,6 +112,7 @@ plot_independentR <- function(res) {
 #' @param res Samples of posterior distribution of parameters.
 #' @param loc Index of the location to examine.
 #' @return A ggplot2 time series of estimated R with 80% confidence.
+#' @export
 plot_locationR <- function(res, loc) {
   thetadf <- data.frame(res$params$theta +
                           res$params$lambda[loc] +
@@ -138,6 +142,7 @@ plot_locationR <- function(res, loc) {
 #'
 #' @param res Samples of posterior distribution of parameters.
 #' @return A histogram of all samples of epsilon.
+#' @export
 plot_epsilon_dispersion <- function(res) {
   df <- data.frame(adjustment = as.vector(res$epsilon))
   ggplot(df, aes(adjustment)) +
@@ -147,18 +152,3 @@ plot_epsilon_dispersion <- function(res) {
                   xlab = "difference in log(R)")
 }
 
-# TODO: move these to the Rmarkdown file
-generate_plots <- function() {
-  res <- results()
-  plot_beta_confidence(res)
-  plot_lambda_confidence(res, 1, 34)
-  plot_lambda_confidence(res, 35, 68)
-  plot_lambda_confidence(res, 69, 102)
-  plot_independentR(res)
-  plot_locationR(res, 13)
-  plot_locationR(res, 55)
-  plot_locationR(res, 79)
-  plot_locationR(res, 96)
-  plot_locationR(res, 99)
-  plot_epsilon_dispersion(res)
-}
