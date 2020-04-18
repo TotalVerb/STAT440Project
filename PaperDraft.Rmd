@@ -286,6 +286,7 @@ temperature is effective at reducing spread, we do not believe this evidence to
 be as strong as claimed.
 
 ## Discussion
+Our model suggests that there is some weak evidence that with increasing temperature, the reproductive number R decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have.  
 
 
 ### Directions for Future Research
