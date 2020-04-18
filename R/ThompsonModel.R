@@ -2,7 +2,6 @@ library(EpiEstim)
 library(dplyr)
 
 #' Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.
-#'
 #' Follows the framework of the Thompson et al. (2019) paper, while using OLS to predict R from climate similar to Wang et al.
 #' EpiEstim's parametric_si mode is actually based on work done by Wallinga and Teunis (2004).
 #' Primarily leverages the EpiEstim R package to perform MCMC and estimate R from time series.
