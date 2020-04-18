@@ -5,9 +5,7 @@
 \alias{cf_mod}
 \title{Compiled STAN model of the seasonal forcing model described in accompanying
 report.}
-\format{
-An object of class \code{stanmodel} of length 1.
-}
+\format{An object of class \code{stanmodel} of length 1.}
 \usage{
 cf_mod
 }
