@@ -180,6 +180,31 @@ The baseline model we build estimates the reproductive rate using a parametric S
 
 For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. This method is outlined in detail in Wallinga and Teunis (2004)[8].
 
+### Data
+
+We sourced the following data:
+
+- Italian case data aggregated per province from the Italian Civil Protection
+  Department (DPC)
+- 2017 demographic data for Italian provinces from Eurostat, via the `restatapi` package
+- Weather data from NOAA's network of stations, via the `worldmet` package
+
+A total of $102$ provinces were included in the analysis. This is all provinces
+except those located in the region of Sardinia. The provinces in Sardinia were
+excluded because of a mismatch between the demographic data and the case data,
+due to a recent political reorganization in Sardinia.
+
+A total of $19$ dates were included in the analysis, starting from the first date
+of February 24, 2020 present in the data and concluding on March 13, 2020.
+Although more dates are available, we felt that the dramatic interventions in
+Italy after March 13 reduced the relevance of seasonal forcings on transmission.
+
+A total of $4$ demographic and climatic features were included in the analysis:
+air temperature, relative humidity, GDP per capita, and population density. The
+demographic features are included as control so that the inferred coefficients
+for weather are not due to spurious correlations with demographics, as Northern
+Italy is generally denser, richer, and cooler on average than Southern Italy.
+
 ## Results
 
 [What methods/models are best]
@@ -198,7 +223,7 @@ Fitting our Bayesian model, which extends the method of Thompson et. al, values
 of beta were estimated for temperature, relative humidity, Gross Domestic
 Product (GDP) and population density, respectively. The mean estimate of $\beta^T$ is
 
-$$ \beta^T = [-0.23198507 -0.05391226  0.26336295 -0.03586852] $$
+$$ \beta^T = \begin{bmatrix} -0.23198507 & -0.05391226 & 0.26336295 & -0.03586852 \end{bmatrix} $$
 
 in the overall model for $R$:
 
