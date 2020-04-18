@@ -195,6 +195,7 @@ $$
 
 ## Results
 
+### Posterior Estimates
 
 Applying the methods depicted from the methodology section, we obtain the following results.
 
@@ -202,21 +203,35 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \includegraphics[width=0.5\textwidth]{plots/plot1.png}
 \end{center}
 
-[TK: Beta Values]
-Fitting our Bayesian model, which extends the method of Thompson et. al, values of beta were estimated for temperature, relative humidity, Gross Domestic Product (GDP) and population density, respectively.  Thus, our model estimates $\beta^T = [,,,,]$ in
+Fitting our Bayesian model, which extends the method of Thompson et. al, values
+of beta were estimated for temperature, relative humidity, Gross Domestic
+Product (GDP) and population density, respectively. The mean estimate of $\beta^T$ is
+
+$$ \beta^T = [-0.23198507 -0.05391226  0.26336295 -0.03586852] $$
+
+in the overall model for $R$:
+
 $$ R_i(t) = \exp\left( \theta(t) + \lambda_i + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)$$
+
 Note that each feature's data is standardized to mean 0 and variance 1.
 
-The model indicates that higher temperatures are observed with lower $R_0$ values, and higher GDP is observed with higher $R_0$ values, while relative humidity and population density have $R_0$ close to zero.
+The model indicates that higher temperatures are observed with lower $R$ values,
+and higher GDP is observed with higher $R$ values, while relative humidity and
+population density have close to no effect on $R$. Because of the confidence
+intervals, we are fairly confident of the directional correctness of this
+relationship for temperature and for GDP per capita.
 
-
-### Climate-Independent Basic R, by Date
+### Estimates of $\theta$, transformed to climate-independent $R$ by date
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot5.png}
 \end{center}
 
-First, we observe that our computed value of $R_0$ in Italy matches what We observe that R_0 spikes in , with an early spike on February 27, potentially due to increased in testing, which captures cases before.
+$R$ is high in early phases, with an early spike on February 27, potentially due
+to increases in testing, which means the data (and hence the model) has
+underestimated the number of infectious cases compared to the ground truth.
+This result is aggregate across the entire nation and is net of any contribution
+to national weather changes.
 
 ### Estimated R in Various Provinces
 
@@ -225,10 +240,50 @@ First, we observe that our computed value of $R_0$ in Italy matches what We obse
 \includegraphics[width=.49\textwidth]{plots/plot7.png}
 \includegraphics[width=.49\textwidth]{plots/plot8.png}
 \includegraphics[width=.49\textwidth]{plots/plot9.png}
-\includegraphics[width=.49\textwidth]{plots/plot10.png}
 \end{center}
 
-Observe that in many cities, our estimated $R_0$ values are extremely high compared to the climate-independent plot shown earlier.
+These plots show the estimated $R$ values in each province computed through the
+samples from the MCMC. An important observation is that the confidence intervals
+for many provinces are very wide, because those provinces have relatively little
+data. However, one strength of our model is that no weighting on results from
+each province needs to be manually done. The data from larger provinces is
+automatically more important because the Poisson likelihood function returns
+smaller results as the rate parameter increases.
+
+We have also analyzed the $\lambda$ and $\varepsilon$ parameters of the model,
+but because these are not as important, see the Appendix for plots and analysis.
+
+In many cities, our estimated $R_0$ values are extremely high. This is because
+those cities reported a dramatic increase in cases, and our estimated $R_0$
+values are indeed consistent with the data. However, we will discuss in the
+interpretation section the limits of our approach, and why we believe this may
+not match the ground truth.
+
+### Interpretation
+
+While the overall results are not surprising, some caution is important in the
+interpretation of these results. There are at least three sources of uncertainty
+not captured in the analysis:
+
+- Uncertainty about the serial interval distribution (our method assumes the
+  serial interval distribution is known)
+- Uncertainty about timeliness of data (our model assumes cases are reported on
+  the date of infection; in reality there is a significant delay, which the model
+  does not attempt to adjust for)
+- Uncertainty of the completeness of the data (our method assumes all cases are
+  reported, which may not be true, as the high spikes in estimated $R$ are
+  unlikely to be ground truth; a more likely explanation is that early cases went
+  undetected for a long time)
+- Uncertainty about the accuracy and currency of data (our model assumes that
+  temperature, relative humidity, GDP per capita, and population data are local
+  and current, but in reality the demographic data is from 2017 and the weather
+  data is measured by the closest station that may be in some cases not even
+  located in the province)
+
+Hence, it is likely that the uncertainty in posterior estimations of $\beta$ by
+the model is understated. While the model provides some evidence that
+temperature is effective at reducing spread, we do not believe this evidence to
+be as strong as claimed.
 
 ## Discussion
 
@@ -244,7 +299,7 @@ Look into statistical simulation models which consider intercity travel and geog
 
 ## Appendix
 
-### Posterior of Lambda, location-dependent adjustment to log(R)
+### Posterior of $\lambda$, location-dependent adjustment to $log(R)$
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot2.png}
@@ -252,10 +307,25 @@ Look into statistical simulation models which consider intercity travel and geog
 \includegraphics[width=.49\textwidth]{plots/plot4.png}
 \end{center}
 
-### Epsilon, Idiosyncratic adjustment to log(R)
+$\lambda$ is an adjustment to the model based on the location. What we observe
+from the distribution of $\lambda$ is that some locations have much more
+certainty in how they deviate from the mean than others. This can be explained
+by the unequal distribution of cases across provinces; provinces with more cases
+lend themselves to more accurate estimation of $R$.
+
+### Epsilon, idiosyncratic adjustment to log(R)
+
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot11.png}
 \end{center}
+
+This histogram shows all samples of all entries in the $\varepsilon$ matrix.
+Generally, we prefer a lower average spread of $\varepsilon$, because it means
+that more of the variation in reproduction number can be predicted from the
+seasonal factors, location, and time alone. Unfortunately, we found the observed
+spread of $\varepsilon$ is quite high, indicating that there is substantial
+variance in reproductive numbers inferred from the data which cannot be
+explained by modeled features.
 
 ### References
 
