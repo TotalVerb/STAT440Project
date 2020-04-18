@@ -178,7 +178,20 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating R from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
-For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. This method is outlined in detail in Wallinga and Teunis (2004)[8].
+For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing the likelihood that a person at timestep $i$ is infected by a person infected at timestep $j$, and summing the likelihood for each $j$ across all its infectees to compute the $R$ value at timestep $j$. Thus, for each province, we produce a daily time series estimate for $R$ on each day. This method is outlined in detail in Wallinga and Teunis (2004)[8].
+
+For each province, day pair, we have $\bar{x} = (x_1, x_2, x_3, x_4), y$ where:
+
+- $x_1$: standardized GDP per capita
+- $x_2$: standardized population density
+- $x_3$: standardized air temperature
+- $x_4$: standardized relative humidity
+- $y$: logarithm of estimated R
+
+We then perform ordinary least squares regression to find $\bar{\beta}$:
+$$
+y = \beta_0 + \beta_1x_1 + \beta_2x_2 + \beta_3 x_3 + \beta_4 x_4 + \varepsilon
+$$
 
 ### Data
 
@@ -206,10 +219,6 @@ for weather are not due to spurious correlations with demographics, as Northern
 Italy is generally denser, richer, and cooler on average than Southern Italy.
 
 ## Results
-
-[What methods/models are best]
-[What condition(s) does each method/model work well/poorly]
-[Conclusion about dataset]
 
 ### Posterior Estimates
 
@@ -302,6 +311,7 @@ temperature is effective at reducing spread, we do not believe this evidence to
 be as strong as claimed.
 
 ## Discussion
+Our model suggests that there is some weak evidence that with increasing temperature, the reproductive number R decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have.  
 
 
 ### Directions for Future Research
