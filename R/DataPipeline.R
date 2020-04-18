@@ -27,27 +27,6 @@ fetch_file <- function(url, filename) {
   })
 }
 
-#' Fetches the latest COVID-19 cases data from European Center for Disease Control (ECDC).
-#'
-#' @returns None
-#'
-fetch_latest_ecdc <- function() {
-  url <- "https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"
-  filename <- "data/ecdc-COVID-19-up-to-date.csv"
-  fetch_file(url, filename)
-
-  #' Quick cleanup on the column titles.
-  #'
-  d <- read.csv(filename, stringsAsFactors = FALSE)
-  d$t <- lubridate::decimal_date(as.Date(d$dateRep, format = "%d/%m/%Y"))
-  d <- d[order(d$'countriesAndTerritories', d$t, decreasing = FALSE), ]
-  names(d)[names(d) == "countriesAndTerritories"] <- "Countries.and.territories"
-  names(d)[names(d) == "deaths"] <- "Deaths"
-  names(d)[names(d) == "cases"] <- "Cases"
-  names(d)[names(d) == "dateRep"] <- "DateRep"
-  write.csv(d, filename)
-}
-
 #' Fetches latest data from John Hopkins University CSSE.
 #'
 #' @return None
@@ -67,13 +46,13 @@ fetch_latest_csse <- function() {
 }
 
 
-#' Fetch Italian provinces data from DPC.
+#' Fetch Italian provinces data from DPC. This file is never written as it contains non-ASCII characters.
 #'
 #' @return None
 #'
 fetch_latest_dpc <- function() {
   url <- "https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-province/dpc-covid19-ita-province.csv"
-  filename <- "data/dpc-covid19-ita-province.csv"
+  filename <- tempfile()
   fetch_file(url, filename)
 
   d <- read.csv(filename)
@@ -84,7 +63,7 @@ fetch_latest_dpc <- function() {
   names(d)[names(d) == "codice_provincia"] <- "province_code"
   names(d)[names(d) == "codice_regione"] <- "region_code"
   names(d)[names(d) == "totale_casi"] <- "total_cases"
-  write.csv(d, filename)
+  d
 }
 
 #' Obtain mapping of health ministry province names to eurostat codes
@@ -110,7 +89,7 @@ getprovincelist <- function() {
   )
   # 3 provinces have names which do not match the ones the health ministry uses;
   # so we rename them to match
-  statname <- c("Valle d'Aosta/Vallée d'Aoste", "Bolzano-Bozen", "Massa-Carrara")
+  statname <- c("Valle d'Aosta/Vall\u00E9e d'Aoste", "Bolzano-Bozen", "Massa-Carrara")
   healthname <- c("Aosta", "Bolzano", "Massa Carrara")
   itprovinces <- left_join(
     itprovinces,
@@ -319,17 +298,11 @@ transform_total_cases <- function(dpc) {
 #'   TRUE, this function may need to be called multiple times due to `worldmet`
 #'   issues.
 collectData <- function(rewriteall = FALSE) {
-  fetch_latest_ecdc()
-  fetch_latest_dpc()
   fetch_latest_csse()
 
-  if (rewriteall | !file.exists("data/demodata.csv")) {
-    demodata <- getdemodata()
-    write.csv(demodata, "data/demodata.csv")
-  }
-
   if (rewriteall | !file.exists("data/dpc-augmented.csv")) {
-    dpc <- read.csv("data/dpc-covid19-ita-province.csv")
+    demodata <- getdemodata()
+    dpc <- fetch_latest_dpc()
     df <- transform_total_cases(dpc)
     df <- augmentDPCdemo(df, demodata)
     df <- robust(augmentDPCweather, timeout=120)(df)
