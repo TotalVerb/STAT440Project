@@ -14,7 +14,7 @@ output:
 
 ## Abstract
 
-Amidst the current COVID-19 epidemic, the prediction of its future spread and the length of the epidemic becomes increasingly significant. We investigate the effects of temperature and humidity on the reproductive rate $R$ of COVID-19, as warmer climates in the summer have historically resulted in diminished spread of influenza. Early epidemiology research in COVID-19 have used simple linear models such as ordinary least squares regression to estimate the relationship between $R$ and climate. We estimate the reproductive rate of the virus using a novel Bayesian inference model with MCMC sampling to daily case data of various climate regions. While results are largely inconclusive, they provide us with a weak posterior update that $R$ decreases with temperature and relative humidity.
+Amidst the current COVID-19 epidemic, the prediction of its future spread and the length of the epidemic become increasingly significant. We investigate the effects of temperature and humidity on the reproductive rate $R$ of COVID-19, as warmer climates in the summer have historically resulted in diminished spread of influenza. Early epidemiology research in COVID-19 have used simple linear models such as ordinary least squares regression to estimate the relationship between $R$ and climate. We estimate the reproductive rate of the virus using a novel Bayesian inference model with MCMC sampling to daily case data of various climate regions. While results are largely inconclusive, they provide us with a weak posterior update that $R$ decreases with temperature and relative humidity.
 
 ## Introduction
 
@@ -23,7 +23,7 @@ Exponential growth of the number of symptomatic cases is usually observed in the
 - The serial interval: time between onset of symptoms of two adjacent individuals in a transmission chain.
 - The reproductive number, $R$: the expected number of new infections a single symptomatic individual will cause.
 
-Due to inadequate public data to compute the serial interval, we use the estimated serial interval of $4.7$ days with standard deviation $2.9$ days obtained from Nishiura et al. (2020) [1]. The estimation of the latter quantity is important for policy, because infectious disease outbreaks will switch from an exponential growth regime to an exponential decay regime when the reproductive number falls below 1. The goal of mitigation or suppression policies is therefore to effect change on the reproductive number $R$. Many infectious diseases are believed to be seasonal, including most respiratory viruses, like the SARS-CoV-2 virus implicated in the 2019–2020 coronavirus pandemic. Wang et al. (2020) [3] have analysed how the weather of locations within China correlates with local point estimates of the reproductive number $R$. However, because their analysis is frequentist in nature, their estimates of the seasonal forcing do not come with any estimate of uncertainty.
+Due to inadequate public data to compute the serial interval, we use the estimated serial interval of $4.7$ days with standard deviation $2.9$ days obtained from Nishiura et al. (2020) [1]. The estimation of the latter quantity is important for policy, because infectious disease outbreaks will switch from an exponential growth regime to an exponential decay regime when the reproductive number falls below 1. The goal of mitigation or suppression policies is therefore to reduce the reproductive number $R$. Many infectious diseases are seasonal, including most respiratory viruses, like the SARS-CoV-2 virus implicated in the 2019–2020 coronavirus pandemic. Wang et al. (2020) [3] have analysed how the weather of locations within China correlates with local point estimates of the reproductive number $R$. However, because their analysis is frequentist in nature, their estimates of the seasonal forcing do not come with any estimate of uncertainty.
 
 We first produce a baseline model, which predicts the reproductive rate using the EpiEstim package, based on previous work by Thompson et al. (2019) [2], and applied to COVID-19 data as in Abbot et al. (2020) [4]. We then apply ordinary least squares regression against climate variables as well as other underlying regional factors, such as population density, GDP per capita, and latitude, similar to the work produced by Wang et al. (2020)[3]. We compare this against our novel Bayesian framework, and evaluate the significance of the explanatory variables in each model.
 
@@ -42,7 +42,7 @@ their approach, ignoring the imported cases:
 
 We developed a method to estimate the strength of various seasonal forcings on
 $R$ through MCMC. This involves both substantial deviations from the second part
-of the Thompson et al. model and also less less substantial adjustments for the
+of the Thompson et al. model and also less substantial adjustments for the
 nature of our data. Our method does not extend the first part of the Thompson et
 al. model.
 
