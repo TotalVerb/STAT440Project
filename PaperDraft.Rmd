@@ -178,14 +178,7 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020), which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Cori et al. (2013) [7] for estimating R from bayesian inference on serial interval and time series data, which can be easily implemented using the EpiEstim package.
 
-
-### Dataset
-
-[TK: retained from proposal, need to modify]
-
-- The Italian government dataset at https://github.com/pcm-dpc/COVID-19 contains the disease incidence for each province. This data contains date of confirmation instead of date of onset of symptoms, and so some procedure may be necessary to correct for this. Abbott et al. (2020) outlines a technique to correct for reporting delays using an exponential distribution of reporting delay fit to line list data; we may use the same distribution.
-- The `worldmet` R package enables access to temperature and humidity data, sourced from NOAA.
--
+For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model.
 
 ## Results
 [What methods/models are best]
@@ -243,9 +236,9 @@ The model indicates that higher temperatures are observed with lower $R_0$ value
 
 ## Discussion
 
+
 ### Directions for Future Research
 
-One particularly counterintuitive result in de
 
 With our `cfc19i` library, it is
 
