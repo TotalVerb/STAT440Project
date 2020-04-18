@@ -176,10 +176,13 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 ### Using OLS and EpiEstim to check results
 
-The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020), which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Cori et al. (2013) [7] for estimating R from bayesian inference on serial interval and time series data, which can be easily implemented using the EpiEstim package.
+The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating R from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
-For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model.
+For each province, we take a 7 day rolling sum on the number of new cases each day, and feed the data into the parametric SI model, which is given distribution $w(\tau)$ From there, the model uses a likelihood based approach to estiamte R at each discrete timestep, computing
 
+$$
+p_{ij} = \frac{w(t_i - t_j)}{\sum_{i \neq k} }
+$$
 ## Results
 [What methods/models are best]
 [What condition(s) does each method/model work well/poorly]
@@ -264,3 +267,5 @@ Look into statistical simulation models which consider intercity travel and geog
 [6] “Report 13 - Estimating the Number of Infections and the Impact of Non-Pharmaceutical Interventions on COVID-19 in 11 European Countries.” Imperial College London, www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-13-europe-npi-impact/.
 
 [7] Anne Cori, Neil M. Ferguson, Christophe Fraser, Simon Cauchemez, A New Framework and Software to Estimate Time-Varying Reproduction Numbers During Epidemics, American Journal of Epidemiology, Volume 178, Issue 9, 1 November 2013, Pages 1505–1512, https://doi.org/10.1093/aje/kwt133
+
+[8] Jacco Wallinga, Peter Teunis, Different Epidemic Curves for Severe Acute Respiratory Syndrome Reveal Similar Impacts of Control Measures, American Journal of Epidemiology, Volume 160, Issue 6, 15 September 2004, Pages 509–516, https://doi.org/10.1093/aje/kwh255
