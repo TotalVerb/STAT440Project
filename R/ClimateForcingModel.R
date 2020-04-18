@@ -3,6 +3,13 @@ library(dplyr)
 library(tidyr)
 library(abind)
 
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+#' Compiled STAN model of the seasonal forcing model described in accompanying
+#' report.
+cf_mod <- stan_model("ClimateForcingModel.stan")
+
 #' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
 #' CMMID paper https://epiforecasts.io/covid/methods.html
 #' @param n The number of discrete dates in the future to compute a serial
@@ -20,10 +27,6 @@ getSIdist <- function(n, mean = 4.7, sd = 2.9) {
 #' Compile the stan model, run MCMC, and save results.
 #' @param cutoff The cutoff date (default: Mar 14).
 runMCMC <- function(cutoff = "2020-03-14") {
-  cf_mod <- stan_model("ClimateForcingModel.stan")
-  options(mc.cores = parallel::detectCores())
-  rstan_options(auto_write = TRUE)
-
   df <- read.csv("data/dpc-augmented.csv", stringsAsFactors = FALSE)
 
   # Stop the analysis on Mar 13
