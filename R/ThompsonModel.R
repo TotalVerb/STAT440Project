@@ -9,7 +9,6 @@ library(dplyr)
 #'
 #' @param filename The path to the augmented data file which we will be using.
 #' @return Fit object, result of linear regression on log(R) against standardized confounding variables.
-#' @export
 runThompson <- function(filename = "inst/extdata/dpc-augmented.csv") {
   dpc_df <- read.csv(filename)
   dpc_df$date <- as.Date(dpc_df$date, format = "%Y-%m-%d")
