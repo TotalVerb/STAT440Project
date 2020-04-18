@@ -183,10 +183,14 @@ For each province, we take a 7 day rolling sum on the number of new cases each d
 $$
 p_{ij} = \frac{w(t_i - t_j)}{\sum_{i \neq k} }
 $$
+
 ## Results
+
 [What methods/models are best]
 [What condition(s) does each method/model work well/poorly]
 [Conclusion about dataset]
+
+### Posterior Estimates
 
 Applying the methods depicted from the methodology section, we obtain the following results.
 
@@ -195,28 +199,34 @@ Applying the methods depicted from the methodology section, we obtain the follow
 \end{center}
 
 [TK: Beta values]
-Fitting our Bayesian model, which extends the method of Thompson et. al, values of beta were estimated for temperature, relative humidity, Gross Domestic Product (GDP) and population density, respectively.  Thus, our model estimates $\beta^T = [,,,,]$ in
+Fitting our Bayesian model, which extends the method of Thompson et. al, values
+of beta were estimated for temperature, relative humidity, Gross Domestic
+Product (GDP) and population density, respectively. The mean estimate of $\beta^T$ is
+
+$$ \beta^T = [-0.23198507 -0.05391226  0.26336295 -0.03586852] $$
+
+in the overall model for $R$
+
 $$ R_i(t) = \exp\left( \theta(t) + \lambda_i + \mathbf{\beta}^T x_i(t) + \varepsilon_i(t) \right)$$
 Note that each feature's data is standardized to mean 0 and variance 1.
 
-The model indicates that higher temperatures are observed with lower $R_0$ values, and higher GDP is observed with higher $R_0$ values, while relative humidity and population density have $R_0$ close to zero.
+The model indicates that higher temperatures are observed with lower $R$ values,
+and higher GDP is observed with higher $R$ values, while relative humidity and
+population density have close to no effect on $R$. Because of the confidence
+intervals, we are fairly confident of the directional correctness of this
+relationship for temperature and for GDP per capita.
 
-### Posterior of Lambda, location-dependent adjustment to log(R)
-
-\begin{center}
-\includegraphics[width=.49\textwidth]{plots/plot2.png}
-\includegraphics[width=.49\textwidth]{plots/plot3.png}
-\includegraphics[width=.49\textwidth]{plots/plot4.png}
-\end{center}
-
-- $\lambda$ is an adjustment to the model based on the location you're in.
 ### Climate-Independent Basic R, by Date
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot5.png}
 \end{center}
-- R_0 is high in early phases, with an early spike on February 27, potentially due to increased in testing, which captures cases before.
-- Climate-independent means ignores local climates, and produces an aggregate result.
+
+$R$ is high in early phases, with an early spike on February 27, potentially due
+to increases in testing, which means the data (and hence the model) has
+underestimated the number of infectious cases compared to the ground truth.
+This result is aggregate across the entire nation and is net of any contribution
+to national weather changes.
 
 ### Estimated R in Cities by Date
 
@@ -228,14 +238,17 @@ The model indicates that higher temperatures are observed with lower $R_0$ value
 \includegraphics[width=.49\textwidth]{plots/plot10.png}
 \end{center}
 
-- local, no longer climate independent.
+These plots show the estimated $R$ values in each province computed through the
+samples from the MCMC. An important observation is that the confidence intervals
+for many provinces are very wide, because those provinces have relatively little
+data. However, one strength of our model is that no weighting on results from
+each province needs to be manually done. The data from larger provinces is
+automatically more important because the Poisson likelihood function returns
+smaller results as the rate parameter increases.
 
-### Epsilon, Idiosyncratic adjustment to log(R)
-\begin{center}
-\includegraphics[width=.49\textwidth]{plots/plot11.png}
-\end{center}
+We have also analyzed the $\lambda$ and $\varepsilon$ parameters of the model,
+but because these are not as important, see the Appendix for plots and analysis.
 
-- You want to minimize the value episilon.
 
 ## Discussion
 
@@ -251,6 +264,27 @@ Look into statistical simulation models which consider intercity travel and geog
 
 ## Appendix
 
+### Posterior of $\lambda$, location-dependent adjustment to $log(R)$
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot2.png}
+\includegraphics[width=.49\textwidth]{plots/plot3.png}
+\includegraphics[width=.49\textwidth]{plots/plot4.png}
+\end{center}
+
+$\lambda$ is an adjustment to the model based on the location. What we observe
+from the distribution of $\lambda$ is that some locations have much more
+certainty in how they deviate from the mean than others. This can be explained
+by the unequal distribution of cases across provinces; provinces with more cases
+lend themselves to more accurate estimation of $R$.
+
+### Epsilon, idiosyncratic adjustment to log(R)
+
+\begin{center}
+\includegraphics[width=.49\textwidth]{plots/plot11.png}
+\end{center}
+
+- You want to minimize the value episilon.
 
 ### References
 
