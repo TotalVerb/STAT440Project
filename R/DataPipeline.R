@@ -278,18 +278,21 @@ robust <- function(f, timeout = 60) {
 }
 
 #' Repair total case data to be monotonically increasing, through taking a rolling maximum.
-#' Drop the last date as it is likely to have no weather data for each location.
+#' Drop the last 4 dates as it is likely to have no weather data for each location.
 #' Add new_cases column which contains the number of new cases each day.
 #'
 #' @param dpc Dataframe of DPC per province timeseries. Requires the columns: "date", "province", "total_cases".
 #'
 #' @return Transformed dataframe with modified "total_cases" column, where the column is now monotonically increasing.
-repairtotalcases <- function(dpc) {
+transform_total_cases <- function(dpc) {
   (dpc
    %>% group_by(province)
    %>% group_modify(~ arrange(.x, by=date) %>% mutate(total_cases = cummax(total_cases)))
    %>% mutate(new_cases = c(0, diff(total_cases)))
    %>% ungroup
+   %>% filter(date != max(as.character(date)))
+   %>% filter(date != max(as.character(date)))
+   %>% filter(date != max(as.character(date)))
    %>% filter(date != max(as.character(date)))
   )
 }
@@ -312,7 +315,7 @@ collectData <- function(rewriteall = FALSE) {
 
   if (rewriteall | !file.exists("data/dpc-augmented.csv")) {
     dpc <- read.csv("data/dpc-covid19-ita-province.csv")
-    df <- repairtotalcases(dpc)
+    df <- transform_total_cases(dpc)
     df <- augmentDPCdemo(df, demodata)
     df <- robust(augmentDPCweather, timeout=120)(df)
     write.csv(df, "data/dpc-augmented.csv")

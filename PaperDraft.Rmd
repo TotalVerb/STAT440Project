@@ -178,6 +178,7 @@ we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020), which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Cori et al. (2013) [7] for estimating R from bayesian inference on serial interval and time series data, which can be easily implemented using the EpiEstim package.
 
+
 ### Dataset
 
 [TK: retained from proposal, need to modify]
