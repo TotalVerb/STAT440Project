@@ -2,7 +2,10 @@
 % Please edit documentation in R/ThompsonModel.R
 \name{runThompson}
 \alias{runThompson}
-\title{Using Italian Provincial COVID-19 dataset augmented with climate and population statistics.}
+\title{Follows the framework of the Thompson et al. (2019) paper, while using OLS to predict R from climate similar to Wang et al.
+EpiEstim's parametric_si mode is actually based on work done by Wallinga and Teunis (2004).
+Primarily leverages the EpiEstim R package to perform MCMC and estimate R from time series.
+Requires some estimate of serial interval, which we simply use values from pervious papers for.}
 \usage{
 runThompson(filename = "data/dpc-augmented.csv")
 }
