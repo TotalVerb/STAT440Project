@@ -1,22 +1,20 @@
 ---
 title: "Inference of seasonal forcings on reproduction numbers during epidemics"
 author: "Fengyang Wang, Lu Lu, Ziyao Tian, Yi Xiao Zhang"
+organization: "STAT 440 Final Project"
 header-includes:
     - \usepackage{setspace}\onehalfspacing
 output:
-  pdf_document: default
+  pdf_document:
+    number_sections: true
   html_notebook: default
-  rmarkdown::pdf_document:
-    fig_caption: yes        
-    includes:  
-      in_header: preamble.tex
 ---
 
-## Abstract
+\textbf{Abstract}
 
 Amidst the current COVID-19 epidemic, the prediction of its future spread and the length of the epidemic become increasingly significant. We investigate the effects of temperature and humidity on the reproductive rate $R$ of COVID-19, as warmer climates in the summer have historically resulted in diminished spread of influenza. Early epidemiology research in COVID-19 have used simple linear models such as ordinary least squares regression to estimate the relationship between $R$ and climate. We estimate the reproductive rate of the virus using a novel Bayesian inference model with MCMC sampling to daily case data of various climate regions. While results are largely inconclusive, they provide us with a weak posterior update that $R$ decreases with temperature and relative humidity.
 
-## Introduction
+# Introduction
 
 Exponential growth of the number of symptomatic cases is usually observed in the initial stages of infectious disease epidemics. Typically, the rate of this growth is decomposed into two quantities:
 
@@ -29,7 +27,7 @@ We first produce a baseline model, which predicts the reproductive rate using th
 
 Since Italy was one of the first countries affected by the epidemic, it has a longer history of case data before intervention and lockdowns took place. Furthermore, due to the many provinces of Italy having diverse climates, we have access to a larger range of temperature and humidity. Therefore, we sourced the Italian government DPC dataset[5], which contains time series incidence for each province since mid February. Using the temperature and humidity data from weather stations sourced from NOAA, we are able to estimate the climate for over $80$ distinct provinces in the Italian COVID-19 dataset.
 
-## Methodology
+# Methodology
 
 Thompson et al. (2019) outline a Bayesian framework for estimation of $R(t)$
 using symptomatic case counts, decomposed into local and imported cases. The
@@ -50,7 +48,7 @@ To sanity-check the results of our method, we compare its conclusions against a
 point estimate for the seasonal forcings through linear regression with the
 EpiEstim estimates of $R$.
 
-### Incidence likelihood of the Thompson et al. model
+## Incidence likelihood of the Thompson et al. model
 
 In its estimation of time-varying $R$, the Thompson et al. model uses the
 following likelihood function for the number of new infections at time $t$:
@@ -69,7 +67,7 @@ conjugate prior for a Poisson likelihood) and because they chose a convenient
 family of serial interval distributions, the Bayesian posterior in the Thompson
 et al. model can be described by a closed form analytic expression.
 
-### Extension of Thompson et al. for $R$ subject to forcings
+## Extension of Thompson et al. for $R$ subject to forcings
 
 Our Bayesian model extends the method of Thompson et al. to multiple locations,
 each with its own incidence time series $I_1(t),\cdots,I_n(t)$ such that
@@ -174,7 +172,7 @@ As the model is much more complex than the one in the Thompson et al. paper, we
 are unable to derive an analytic expression to compute the posterior. Instead,
 we use `rstan` to run $4$ chains of MCMC for $2000$ iterations each.
 
-### Using OLS and EpiEstim to check results
+## Using OLS and EpiEstim to check results
 
 The baseline model we build estimates the reproductive rate using a parametric SI model, where we specify the mean and standard deviation of the serial interval. Because we do not have access to line-list SI data for COVID-19, we are unable to effectively estimate the serial interval from data, thus we take the findings of Nishiura et al. (2020) [1], which estimated the mean serial interval to be 4.7 and the standard deviation to be 2.4. We use the model detailed in Wallinga and Teunis (2004) [8] for estimating $R$ from bayesian inference on a fixed serial interval distribution and time series data, which can be easily implemented using the EpiEstim package produced by Cori et al. (2013) [7].
 
@@ -196,7 +194,7 @@ $$
 y = \beta_0 + \beta_1x_1 + \beta_2x_2 + \beta_3 x_3 + \beta_4 x_4 + \varepsilon
 $$
 
-### Data
+## Data
 
 We sourced the following data:
 
@@ -221,18 +219,17 @@ demographic features are included as control so that the inferred coefficients
 for weather are not due to spurious correlations with demographics, as Northern
 Italy is generally denser, richer, and cooler on average than Southern Italy.
 
-## Results
+# Results
 
-### Posterior Estimates
+## Posterior Estimates
 
 Applying the methods depicted from the methodology section, we obtain the following results.
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=0.5\textwidth]{plots/plot1.png}
-\end{center}
-
-```{r include=FALSE}
-```
+\caption{Posterier distributions of beta}
+\end{figure}
 
 Fitting our Bayesian model, which extends the method of Thompson et. al, values
 of beta were estimated for temperature, relative humidity, Gross Domestic
@@ -264,11 +261,13 @@ $$
 
 We note that the coefficient for GDP per capita has flipped signs from the Bayesian framework estimate, with the other coefficient remaining the same sign. The p-values for GDP per capita and density are 0.00042 and 0.019 respectively, which are both significant. However, the p-values for air temperature and relative humidity are 0.42 and 0.65 respectively, which are much less significant. The large discrepancy in values between coefficients between the two models is surprising, considering they are both based on a linear relationship between $\log(R)$ and the confounding varaibles. Further investigation would be required in the future to determine the cause.
 
-### Estimates of $\theta$, transformed to climate-independent $R$ by date
+## Estimates of $\theta$, transformed to climate-independent $R$ by date
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=.49\textwidth]{plots/plot5.png}
-\end{center}
+\caption{Time series estimate of R with 0.8 confidence bands}
+\end{figure}
 
 $R$ is high in early phases, with an early spike on February 27, potentially due
 to increases in testing, which means the data (and hence the model) has
@@ -276,14 +275,16 @@ underestimated the number of infectious cases compared to the ground truth.
 This result is aggregate across the entire nation and is net of any contribution
 to national weather changes.
 
-### Estimated R in Various Provinces
+## Estimated R in Various Provinces
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=.49\textwidth]{plots/plot6.png}
 \includegraphics[width=.49\textwidth]{plots/plot7.png}
 \includegraphics[width=.49\textwidth]{plots/plot8.png}
 \includegraphics[width=.49\textwidth]{plots/plot9.png}
-\end{center}
+\caption{Time series estimates of R for Bergano, Milan, Rome, Venice}
+\end{figure}
 
 These plots show the estimated $R$ values in each province computed through the
 samples from the MCMC. An important observation is that the confidence intervals
@@ -302,7 +303,7 @@ values are indeed consistent with the data. However, we will discuss in the
 interpretation section the limits of our approach, and why we believe this may
 not match the ground truth.
 
-### Interpretation
+## Interpretation
 
 While the overall results are not surprising, some caution is important in the
 interpretation of these results. There are at least three sources of uncertainty
@@ -328,23 +329,23 @@ the model is understated. While the model provides some evidence that
 temperature is effective at reducing spread, we do not believe this evidence to
 be as strong as claimed.
 
-## Discussion
+# Discussion
 
 The posterior estimates of our model suggest that there is some weak evidence that with increasing temperature, the reproductive number $R$ decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have. Our model does a good job estimating the reproductive number $R$ in various provinces with high confidence level and provides valuable information for policy makers. However, with no access to line-list data to estimate the serial interval number ourselves, our estimated reproductive number $R$ is limited by the accuracy of the serial interval number we used. The estimated $R$ values tend to have wide confidence interval in the beginning dates due to the imported cases in the beginning and the lack of testing. 
 
 For future research, we would like to look into the climate and infection data in different countries as the situation develops further. In particular, we would like to compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, we would like to try fitting a nonlinear relationship between $R$ and seasonal factors.
 
 We would also like to look into statistical simulation models which consider intercity travel and geographic proximity. As our estimated $R$ is dependent on the serial interval number, it would also be worthwhile to see the sensitivity of our model with different values of serial interval number as did Flaxman et al. (2020)[6]. 
+\newpage
+# Appendix
 
-## Appendix
+## Posterior of $\lambda$, location-dependent adjustment to $log(R)$
 
-### Posterior of $\lambda$, location-dependent adjustment to $log(R)$
-
-\begin{center}
+\begin{figure}
 \includegraphics[width=.49\textwidth]{plots/plot2.png}
 \includegraphics[width=.49\textwidth]{plots/plot3.png}
 \includegraphics[width=.49\textwidth]{plots/plot4.png}
-\end{center}
+\end{figure}
 
 $\lambda$ is an adjustment to the model based on the location. What we observe
 from the distribution of $\lambda$ is that some locations have much more
@@ -352,7 +353,7 @@ certainty in how they deviate from the mean than others. This can be explained
 by the unequal distribution of cases across provinces; provinces with more cases
 lend themselves to more accurate estimation of $R$.
 
-### Epsilon, idiosyncratic adjustment to log(R)
+## Epsilon, idiosyncratic adjustment to log(R)
 
 \begin{center}
 \includegraphics[width=.49\textwidth]{plots/plot11.png}
@@ -366,7 +367,7 @@ spread of $\varepsilon$ is quite high, indicating that there is substantial
 variance in reproductive numbers inferred from the data which cannot be
 explained by modeled features.
 
-### References
+## References
 
 [1] Nishiura H, Linton NM, Akhmetzhanov AR. Serial interval of novel coronavirus (2019-nCoV) infections. medRxiv Published Online First: 2020. doi:10.1101/2020.02.03.20019497
 
