@@ -337,25 +337,26 @@ We would also like to look into statistical simulation models which consider int
 
 ### Posterior of $\lambda$, location-dependent adjustment to $log(R)$
 
-\begin{center}
+\begin{figure}
 \includegraphics[width=.49\textwidth]{plots/plot2.png}
 \includegraphics[width=.49\textwidth]{plots/plot3.png}
 \includegraphics[width=.49\textwidth]{plots/plot4.png}
-\end{center}
+\caption{Posterior location of $\lambda$, split into three plots for each
+location. $\lambda$ is an adjustment to the model based on the location.}
+\end{figure}
 
-$\lambda$ is an adjustment to the model based on the location. What we observe
-from the distribution of $\lambda$ is that some locations have much more
-certainty in how they deviate from the mean than others. This can be explained
-by the unequal distribution of cases across provinces; provinces with more cases
-lend themselves to more accurate estimation of $R$.
+What we observe from the distribution of $\lambda$ is that some locations have
+much more certainty in how they deviate from the mean than others. This can be
+explained by the unequal distribution of cases across provinces; provinces with
+more cases lend themselves to more accurate estimation of $R$.
 
 ### Epsilon, idiosyncratic adjustment to log(R)
 
-\begin{center}
+\begin{figure}
 \includegraphics[width=.49\textwidth]{plots/plot11.png}
-\end{center}
+\caption{Histogram of all samples of all entires in the $\varepsilon$ matrix.}
+\end{figure}
 
-This histogram shows all samples of all entries in the $\varepsilon$ matrix.
 Generally, we prefer a lower average spread of $\varepsilon$, because it means
 that more of the variation in reproduction number can be predicted from the
 seasonal factors, location, and time alone. Unfortunately, we found the observed
