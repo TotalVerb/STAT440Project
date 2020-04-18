@@ -8,7 +8,7 @@ rstan_options(auto_write = TRUE)
 
 #' Compiled STAN model of the seasonal forcing model described in accompanying
 #' report.
-cf_mod <- stan_model("ClimateForcingModel.stan")
+cf_mod <- stan_model("stan-models/ClimateForcingModel.stan")
 
 #' Discretize the serial interval distribution of 4.7 std. dev 2.9, used in the
 #' CMMID paper https://epiforecasts.io/covid/methods.html

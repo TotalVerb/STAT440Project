@@ -326,16 +326,12 @@ temperature is effective at reducing spread, we do not believe this evidence to
 be as strong as claimed.
 
 ## Discussion
-Our model suggests that there is some weak evidence that with increasing temperature, the reproductive number R decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have.  
 
+The posterior estimates of our model suggest that there is some weak evidence that with increasing temperature, the reproductive number R decreases. The effect of relative humidity on the reproductive number is much less conclusive. As we only used data from Italy in our model building, there is a limited range of weather information than we would like to have. Our model does a good job estimating the reproductive number $R$ in various provinces with high confidence level and provides valuable information for policy makers. However, with no access to line-list data to estimate the serial interval number ourselves, our estimated reproductive number R is limited by the accuracy of the serial interval number we used. The estimated $R$ values tend to have wide confidence interval in the beginning dates due to the imported cases in the beginning and the lack of testing. 
 
-### Directions for Future Research
+For furure research, we would like to look into the climate and infection data in different countries as the situation develops further. In particular, we would like to compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, we would like to try fitting a nonlinear relationship between $R$ and seasonal factors.
 
-
-
-Looking at the climate and infection data in American and Canadian cities as the situation develops further. In particular, compare this with the results in Italy, and observe if the linear assumption between seasonal factors and $R$ holds true across different climate regions. If not, try fitting while assuming a nonlinear relationship between $R$ and seasonal factors.
-
-Look into statistical simulation models which consider intercity travel and geographic proximity.
+We would also like to look into statistical simulation models which consider intercity travel and geographic proximity. As our estimated $R$ is dependent on the serial interval number, it would also be worthwhile to see the sensitivity of our model with different values of serial interval number as Flaxman has done in [6]. 
 
 ## Appendix
 
