@@ -6,11 +6,12 @@
 #' @importFrom rstan sampling
 #' @importFrom abind abind
 #' @importFrom bayesplot mcmc_areas mcmc_intervals
-#' @importFrom ggplot2 element_blank element_text geom_histogram geom_smooth ggplot xlim ylab
+#' @importFrom ggplot2 aes element_blank element_text geom_histogram geom_smooth ggplot xlim ylab
 #' @importFrom worldmet getMeta
 #' @importFrom restatapi get_eurostat_data get_eurostat_dsd
-#' @importFrom EpiEstim estimate_R
+#' @importFrom EpiEstim estimate_R make_config
 #' @importFrom R.utils withTimeout
+#' @importFrom tidyr pivot_longer
 NULL
 
 #' dpc-covid19-ita-province
@@ -43,3 +44,8 @@ NULL
 #' @docType data
 #' @name time_series_covid19_recovered_global
 NULL
+
+# dplyr "globals" and cf_data, cf_fit which come from `load`, throw.error from R.oo
+utils::globalVariables(c("RH", "adjustment", "age", "air_temp", "cf_data", "cf_fit", "code", "concept",
+                         "dates", "fit", "gdppercapita", "lat", "logR", "province", "region", "sex",
+                         "theme", "throw.error", "total_cases", "unit", "values", "values.x", "values.y"))
